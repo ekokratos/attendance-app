@@ -517,8 +517,11 @@ class _HomePageState extends State<HomePage> {
 
   Iterable<Widget> _detailItemsFor(Section section) {
     final Iterable<Widget> detailItems =
-        section.details.map<Widget>((AttendanceDetail detail) {
-      return SectionDetailView(detail: detail);
+        section.details.map<Widget>((var detail) {
+      if (detail is AttendanceDetail)
+        return AttendanceSectionDetailView(detail: detail);
+      if (detail is MarksDetail) return MarksSectionDetailView(detail: detail);
+      return Container();
     });
     return ListTile.divideTiles(context: context, tiles: detailItems);
   }

@@ -1,12 +1,5 @@
 import 'package:flutter/material.dart';
 
-const Color _mariner = Color(0xFFFEC601);
-const Color _mediumPurple = Color(0xFFFFB70F);
-const Color _tomato = Color(0xFF084887);
-const Color _mySin = Color(0xFF2CA8FF);
-
-const String _kGalleryAssetsPackage = 'flutter_gallery_assets';
-
 class AttendanceDetail {
   const AttendanceDetail({
     this.subject,
@@ -47,7 +40,7 @@ class Section {
   final String title;
   final Color leftColor;
   final Color rightColor;
-  final List<AttendanceDetail> details;
+  final List details;
 
   @override
   bool operator ==(Object other) {
@@ -59,10 +52,6 @@ class Section {
   @override
   int get hashCode => title.hashCode;
 }
-
-// TODO(hansmuller): replace the SectionDetail images and text. Get rid of
-// the const vars like _eyeglassesDetail and insert a variety of titles and
-// image SectionDetails in the allSections list.
 
 const AttendanceDetail subjectDetail1 = AttendanceDetail(
     subject: 'Python Application Programming',
@@ -99,15 +88,15 @@ const AttendanceDetail subjectDetail5 = AttendanceDetail(
     attendedClasses: 18,
     percentage: (18 / 30) * 100);
 
-const MarksDetail MarksDetail1 = MarksDetail(
+const MarksDetail marksDetail1 = MarksDetail(
     subject: 'Computer Organisation',
     firstIA: 13,
     secondIA: 7,
     thirdIA: 13,
     average: 13);
 
-const MarksDetail MarksDetail2 = MarksDetail(
-    subject: 'Computer Organisation',
+const MarksDetail marksDetail2 = MarksDetail(
+    subject: 'Machine Learning',
     firstIA: 13,
     secondIA: -1,
     thirdIA: -1,
@@ -130,7 +119,7 @@ final List<Section> allSections = <Section>[
     title: 'MARKS',
     leftColor: Color(0xFFFF9100),
     rightColor: Color(0xFFFFB70F),
-    details: <AttendanceDetail>[],
+    details: <MarksDetail>[marksDetail1, marksDetail2],
   ),
   const Section(
     title: 'LETTERS',
