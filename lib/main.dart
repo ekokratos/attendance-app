@@ -6,6 +6,7 @@ import 'package:attendance_app/UI/lecturer_login.dart';
 import 'package:attendance_app/UI/lecturer_homepage.dart';
 import 'UI/letters.dart';
 import 'UI/letter_list.dart';
+import 'package:attendance_app/UI/broadcast.dart';
 
 void main() => runApp(MyApp());
 
@@ -22,7 +23,8 @@ class MyApp extends StatelessWidget {
         '/home': (context) => HomePage(),
         '/lecturerHome': (context) => LecturerHome(),
         '/letters': (context) => Letters(),
-        '/letters_list': (context) => LetterList()
+        '/letters_list': (context) => LetterList(),
+        '/broadcast': (context) => Broadcast(),
       },
     );
   }

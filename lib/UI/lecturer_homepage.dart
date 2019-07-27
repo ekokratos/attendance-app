@@ -38,10 +38,13 @@ class _LecturerHomeState extends State<LecturerHome> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Text(
-                            'Broadcast',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 24),
+                          Hero(
+                            tag: 'broadcastText',
+                            child: Text(
+                              'Broadcast',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500, fontSize: 20),
+                            ),
                           ),
                           IconButton(
                               icon: Icon(
@@ -68,7 +71,9 @@ class _LecturerHomeState extends State<LecturerHome> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                           color: Colors.lightBlueAccent,
-                          onPressed: () {})
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/broadcast');
+                          })
                     ],
                   ),
                 ),
@@ -86,7 +91,7 @@ class _LecturerHomeState extends State<LecturerHome> {
                           Text(
                             'Letters',
                             style: TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 24),
+                                fontWeight: FontWeight.w500, fontSize: 20),
                           ),
                           IconButton(
                               icon: Icon(
