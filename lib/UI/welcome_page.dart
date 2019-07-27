@@ -51,7 +51,7 @@ class WelcomePage extends StatelessWidget {
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context, '/login');
+                    Navigator.pushNamed(context, '/studentLogin');
                   },
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50.0),
@@ -65,7 +65,9 @@ class WelcomePage extends StatelessWidget {
                   'Lecturer',
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, '/lecturerLogin');
+                },
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50.0),
                 ),
