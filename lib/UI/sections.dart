@@ -30,6 +30,12 @@ class MarksDetail {
   final double average;
 }
 
+class LetterDetail {
+  const LetterDetail({this.title, this.imageUrl});
+  final String title;
+  final String imageUrl;
+}
+
 class Section {
   const Section({
     this.title,
@@ -102,6 +108,11 @@ const MarksDetail marksDetail2 = MarksDetail(
     thirdIA: -1,
     average: 7);
 
+const LetterDetail letterDetail1 = LetterDetail(
+    title: 'Letter for SIH 2019',
+    imageUrl:
+        'https://raw.githubusercontent.com/melwinlobo18/HTML/master/permission_letter.pdf');
+
 final List<Section> allSections = <Section>[
   const Section(
     title: 'ATTENDANCE',
@@ -125,7 +136,7 @@ final List<Section> allSections = <Section>[
     title: 'LETTERS',
     leftColor: Color(0xFFF3A646),
     rightColor: Color(0xFFF95B57),
-    details: <AttendanceDetail>[],
+    details: <LetterDetail>[letterDetail1],
   ),
   const Section(
     title: 'FACULTY',

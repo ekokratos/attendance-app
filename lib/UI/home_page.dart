@@ -447,6 +447,7 @@ class _HomePageState extends State<HomePage> {
   final PageController _detailsPageController = PageController();
   ScrollPhysics _headingScrollPhysics = const NeverScrollableScrollPhysics();
   ValueNotifier<double> selectedIndex = ValueNotifier<double>(0.0);
+  final Section section = Section();
 
   @override
   Widget build(BuildContext context) {
@@ -457,14 +458,6 @@ class _HomePageState extends State<HomePage> {
         builder: _buildBody,
       ),
     );
-  }
-
-  void _handleBackButton(double midScrollOffset) {
-    if (_scrollController.offset >= midScrollOffset)
-      _scrollController.animateTo(0.0,
-          curve: _kScrollCurve, duration: _kScrollDuration);
-    else
-      Navigator.maybePop(context);
   }
 
   // Only enable paging for the heading when the user has scrolled to midScrollOffset.
@@ -506,7 +499,6 @@ class _HomePageState extends State<HomePage> {
 
   bool _handlePageNotification(ScrollNotification notification,
       PageController leader, PageController follower) {
-    print("sdsdsd");
     if (notification.depth == 0 && notification is ScrollUpdateNotification) {
       selectedIndex.value = leader.page;
       if (follower.page != leader.page)
@@ -522,6 +514,8 @@ class _HomePageState extends State<HomePage> {
       if (detail is AttendanceDetail)
         return AttendanceSectionDetailView(detail: detail);
       if (detail is MarksDetail) return MarksSectionDetailView(detail: detail);
+      if (detail is LetterDetail)
+        return LetterSectionDetailView(detail: detail);
       return null;
     });
     return ListTile.divideTiles(context: context, tiles: detailItems);

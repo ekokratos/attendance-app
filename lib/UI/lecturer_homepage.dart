@@ -113,7 +113,9 @@ class _LecturerHomeState extends State<LecturerHome> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                           color: Colors.lightBlueAccent,
-                          onPressed: () {})
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/letters');
+                          })
                     ],
                   ),
                 ),

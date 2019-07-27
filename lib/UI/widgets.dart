@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'sections.dart';
-
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const double kSectionIndicatorWidth = 32.0;
 
@@ -322,5 +321,73 @@ class MarksSectionDetailView extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class LetterSectionDetailView extends StatelessWidget {
+  final LetterDetail detail;
+  LetterSectionDetailView({this.detail});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 16),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        child: Card(
+          elevation: 10,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      detail.title,
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                    ),
+                    PopupMenuButton(
+                      onSelected: (value) async {
+                        if (value == 'Open')
+                          _launchURL(
+                              'http://docs.google.com/viewer?url=${detail.imageUrl}');
+                      },
+                      itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                        const PopupMenuItem(
+                          value: 'Open',
+                          child: Text('Open'),
+                        ),
+                        const PopupMenuItem(
+                          value: 'Delete',
+                          child: Text('Delete'),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Text(
+                    'Add USN',
+                    style: TextStyle(color: Colors.orange, fontSize: 16),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+_launchURL(String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
   }
 }
