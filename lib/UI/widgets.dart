@@ -106,9 +106,9 @@ class SectionIndicator extends StatelessWidget {
 }
 
 // Display a single SectionDetail.
-class SectionDetailView extends StatelessWidget {
+class AttendanceSectionDetailView extends StatelessWidget {
   final AttendanceDetail detail;
-  SectionDetailView({this.detail});
+  AttendanceSectionDetailView({this.detail});
 
   @override
   Widget build(BuildContext context) {
@@ -178,6 +178,144 @@ class SectionDetailView extends StatelessWidget {
                           ),
                   ),
                 )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MarksSectionDetailView extends StatelessWidget {
+  final MarksDetail detail;
+  MarksSectionDetailView({this.detail});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        child: Card(
+          elevation: 10,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Text(
+                    detail.subject,
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Container(
+                      width: 160,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Text(
+                            'IA1',
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16),
+                          ),
+                          Text(
+                            'IA2',
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16),
+                          ),
+                          Text(
+                            'IA3',
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16),
+                          )
+                        ],
+                      ),
+                    ),
+                    Text(
+                      'Average',
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16),
+                    )
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Container(
+                        width: 160,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Text(
+                              detail.firstIA != -1
+                                  ? detail.firstIA.toString()
+                                  : 'AB',
+                              style: TextStyle(
+                                  color: detail.firstIA != -1
+                                      ? Colors.orange
+                                      : Colors.red,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16),
+                            ),
+                            Text(
+                              detail.secondIA != -1
+                                  ? detail.secondIA.toString()
+                                  : 'AB',
+                              style: TextStyle(
+                                  color: detail.secondIA != -1
+                                      ? Colors.orange
+                                      : Colors.red,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16),
+                            ),
+                            Text(
+                              detail.thirdIA != -1
+                                  ? detail.thirdIA.toString()
+                                  : 'AB',
+                              style: TextStyle(
+                                  color: detail.thirdIA != -1
+                                      ? Colors.orange
+                                      : Colors.red,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20.0),
+                        child: Text(
+                          detail.average != -1
+                              ? detail.average.floor().toString()
+                              : 'AB',
+                          style: TextStyle(
+                              color: detail.average != -1 &&
+                                      detail.average.floor() > 7
+                                  ? Colors.orange
+                                  : Colors.red,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
