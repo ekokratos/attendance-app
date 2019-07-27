@@ -116,8 +116,8 @@ const MarksDetail MarksDetail2 = MarksDetail(
 final List<Section> allSections = <Section>[
   const Section(
     title: 'ATTENDANCE',
-    leftColor: Color(0xFFFEC601),
-    rightColor: Color(0xFFFFD500),
+    leftColor: Color(0xFF8266D4),
+    rightColor: Color(0xFF3B5F8F),
     details: <AttendanceDetail>[
       subjectDetail1,
       subjectDetail2,
@@ -128,20 +128,20 @@ final List<Section> allSections = <Section>[
   ),
   const Section(
     title: 'MARKS',
-    leftColor: Color(0xFFFF9100),
-    rightColor: Color(0xFFFFB70F),
+    leftColor: Color(0xFFF95B57),
+    rightColor: Color(0xFF8266D4),
     details: <AttendanceDetail>[],
   ),
   const Section(
     title: 'LETTERS',
-    leftColor: Color(0xFF042444),
-    rightColor: Color(0xFF084887),
+    leftColor: Color(0xFFF3A646),
+    rightColor: Color(0xFFF95B57),
     details: <AttendanceDetail>[],
   ),
   const Section(
     title: 'FACULTY',
-    leftColor: Color(0xFF2CA8FF),
-    rightColor: Color(0xFF26CFEE),
+    leftColor: Colors.white,
+    rightColor: Color(0xFFF95B57),
     details: <AttendanceDetail>[],
   ),
 ];
