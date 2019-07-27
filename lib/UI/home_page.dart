@@ -506,6 +506,7 @@ class _HomePageState extends State<HomePage> {
 
   bool _handlePageNotification(ScrollNotification notification,
       PageController leader, PageController follower) {
+    print("sdsdsd");
     if (notification.depth == 0 && notification is ScrollUpdateNotification) {
       selectedIndex.value = leader.page;
       if (follower.page != leader.page)
@@ -521,7 +522,7 @@ class _HomePageState extends State<HomePage> {
       if (detail is AttendanceDetail)
         return AttendanceSectionDetailView(detail: detail);
       if (detail is MarksDetail) return MarksSectionDetailView(detail: detail);
-      return Container();
+      return null;
     });
     return ListTile.divideTiles(context: context, tiles: detailItems);
   }
@@ -651,7 +652,7 @@ class _HomePageState extends State<HomePage> {
                   tooltip: 'Logout',
                   onPressed: () {
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                        '/login', (Route<dynamic> route) => false);
+                        '/studentLogin', (Route<dynamic> route) => false);
                   },
                 ),
               ),

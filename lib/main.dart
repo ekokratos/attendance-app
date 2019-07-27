@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'UI/welcome_page.dart';
 import 'UI/student_login.dart';
 import 'UI/home_page.dart';
-import 'package:attendance_app/UI/LecturerLogin.dart';
+import 'package:attendance_app/UI/lecturer_login.dart';
+import 'package:attendance_app/UI/lecturer_homepage.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,12 +12,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/home',
+      initialRoute: '/lecturerLogin',
       routes: {
         '/': (context) => WelcomePage(),
         '/studentLogin': (context) => StudentLogin(),
         '/lecturerLogin': (context) => LecturerLogin(),
-        '/home': (context) => HomePage()
+        '/home': (context) => HomePage(),
+        '/lecturerHome': (context) => LecturerHome(),
       },
     );
   }
