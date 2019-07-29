@@ -42,13 +42,13 @@ class _LettersState extends State<Letters> {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               Card(
                 elevation: 10,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 32.0, vertical: 20),
+                      horizontal: 20.0, vertical: 50),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -80,8 +80,7 @@ class _LettersState extends State<Letters> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.3,
+                            Expanded(
                               child: DropDownButton(
                                   hintText: 'Year',
                                   updatedValue: selectedYear,
@@ -92,8 +91,10 @@ class _LettersState extends State<Letters> {
                                     });
                                   }),
                             ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.3,
+                            SizedBox(
+                              width: 15,
+                            ),
+                            Expanded(
                               child: DropDownButton(
                                   hintText: 'Section',
                                   updatedValue: selectedSection,
@@ -120,23 +121,32 @@ class _LettersState extends State<Letters> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: RaisedButton(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  color: Colors.blue,
-                  child: Text(
-                    'Check Letters',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
+              RaisedButton(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        Icons.volume_up,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        'Check Letters',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                    ],
                   ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/letters_list');
-                  },
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50.0),
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                ),
-              ),
+                  color: Colors.lightBlueAccent,
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/broadcast');
+                  }),
             ],
           ),
         ),

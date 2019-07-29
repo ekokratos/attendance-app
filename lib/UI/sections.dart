@@ -80,20 +80,6 @@ const AttendanceDetail subjectDetail3 = AttendanceDetail(
     attendedClasses: 29,
     percentage: (29 / 30) * 100);
 
-const AttendanceDetail subjectDetail4 = AttendanceDetail(
-    subject: 'Machine Learning',
-    subjectCode: '15CS64',
-    numOfClasses: 30,
-    attendedClasses: 24,
-    percentage: (28 / 30) * 100);
-
-const AttendanceDetail subjectDetail5 = AttendanceDetail(
-    subject: 'Computer Organisation',
-    subjectCode: '15CS65',
-    numOfClasses: 30,
-    attendedClasses: 18,
-    percentage: (18 / 30) * 100);
-
 const MarksDetail marksDetail1 = MarksDetail(
     subject: 'Computer Organisation',
     firstIA: 13,
@@ -111,20 +97,14 @@ const MarksDetail marksDetail2 = MarksDetail(
 const LetterDetail letterDetail1 = LetterDetail(
     title: 'Letter for SIH 2019',
     imageUrl:
-        'https://raw.githubusercontent.com/melwinlobo18/HTML/master/permission_letter.pdf');
+        'https://firebasestorage.googleapis.com/v0/b/cloud-messaging-b6180.appspot.com/o/Melwin%2Fcheck_1.pdf?alt=media&token=ffe65276-82ce-4ca6-a6b9-c030fb4dd3be');
 
 final List<Section> allSections = <Section>[
   const Section(
     title: 'ATTENDANCE',
     leftColor: Color(0xFF8266D4),
     rightColor: Color(0xFF3B5F8F),
-    details: <AttendanceDetail>[
-      subjectDetail1,
-      subjectDetail2,
-      subjectDetail3,
-      subjectDetail4,
-      subjectDetail5,
-    ],
+    details: <AttendanceDetail>[subjectDetail1, subjectDetail2, subjectDetail3],
   ),
   const Section(
     title: 'MARKS',

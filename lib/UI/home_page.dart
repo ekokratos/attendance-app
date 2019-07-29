@@ -1,10 +1,13 @@
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
 import 'sections.dart';
 import 'widgets.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+import 'package:sliver_fill_remaining_box_adapter/sliver_fill_remaining_box_adapter.dart';
 
 const Color _kAppBackgroundColor = Color(0xFF353662);
 const Duration _kScrollDuration = Duration(milliseconds: 400);
@@ -16,8 +19,8 @@ const Curve _kScrollCurve = Curves.fastOutSlowIn;
 // reduced to _kAppBarMidHeight, its layout is horizontal, only one section
 // heading is visible, and the section's list of details is visible below the
 // heading. The appbar's height can be reduced to no more than _kAppBarMinHeight.
-const double _kAppBarMinHeight = 90.0;
-const double _kAppBarMidHeight = 256.0;
+const double _kAppBarMinHeight = 100.0;
+const double _kAppBarMidHeight = 110.0;
 // The AppBar's max height depends on the screen, see _AnimationDemoHomeState._buildBody()
 
 // Initially occupies the same space as the status bar and gets smaller as
@@ -448,11 +451,91 @@ class _HomePageState extends State<HomePage> {
   ScrollPhysics _headingScrollPhysics = const NeverScrollableScrollPhysics();
   ValueNotifier<double> selectedIndex = ValueNotifier<double>(0.0);
   final Section section = Section();
+  final _firestore = Firestore.instance;
+  Future<String> filePath;
+
+  double pagePosition = 0.0;
+  double scrollPosition = 0.0;
+
+  final titleController = TextEditingController();
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      floatingActionButton: pagePosition == 2.0 && scrollPosition >= 90
+          ? FloatingActionButton(
+              onPressed: () async {
+                showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                          title: Text("Add Letter"),
+                          content: Container(
+                            height: 200,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                TextFormField(
+                                  controller: titleController,
+                                  decoration:
+                                      InputDecoration(labelText: 'Title'),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16.0),
+                                  child: RaisedButton(
+                                    child: Text('Select a file'),
+                                    color: Colors.grey[300],
+                                    onPressed: () {
+                                      filePath = FilePicker.getFilePath(
+                                          type: FileType.CUSTOM,
+                                          fileExtension: 'pdf');
+                                    },
+                                  ),
+                                ),
+                                Center(
+                                  child: RaisedButton(
+                                    child: Text('Submit'),
+                                    color: Colors.orange,
+                                    onPressed: () async {
+                                      final StorageReference storageRef =
+                                          FirebaseStorage.instance.ref().child(
+                                              titleController.value.text);
+                                      final StorageUploadTask uploadTask =
+                                          storageRef
+                                              .putFile(File(await filePath));
+                                      StorageTaskSnapshot downloadUrl =
+                                          (await uploadTask.onComplete);
+                                      final String url = (await downloadUrl.ref
+                                          .getDownloadURL());
+                                      print(
+                                          'Title is ${titleController.value.text} and URL Is $url');
+                                      _firestore
+                                          .collection('Student')
+                                          .document(titleController.value.text)
+                                          .setData({
+                                        'title': titleController.value.text,
+                                        'url': url
+                                      });
+                                      titleController.clear();
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ));
+              },
+              child: Icon(Icons.add),
+            )
+          : null,
       body: Builder(
         // Insert an element so that _buildBody can find the PrimaryScrollController.
         builder: _buildBody,
@@ -465,6 +548,10 @@ class _HomePageState extends State<HomePage> {
   bool _handleScrollNotification(
       ScrollNotification notification, double midScrollOffset) {
     if (notification.depth == 0 && notification is ScrollUpdateNotification) {
+      setState(() {
+        scrollPosition = _scrollController.offset;
+      });
+
       final ScrollPhysics physics =
           _scrollController.position.pixels >= midScrollOffset
               ? const PageScrollPhysics()
@@ -515,7 +602,9 @@ class _HomePageState extends State<HomePage> {
         return AttendanceSectionDetailView(detail: detail);
       if (detail is MarksDetail) return MarksSectionDetailView(detail: detail);
       if (detail is LetterDetail)
-        return LetterSectionDetailView(detail: detail);
+        return LetterSectionDetailView(
+          firestore: _firestore,
+        );
       return null;
     });
     return ListTile.divideTiles(context: context, tiles: detailItems);
@@ -574,6 +663,10 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           NotificationListener<ScrollNotification>(
             onNotification: (ScrollNotification notification) {
+              setState(() {
+                pagePosition = _headingPageController.page;
+              });
+
               return _handleScrollNotification(
                   notification, appBarMidScrollOffset);
             },
@@ -608,9 +701,10 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 // Details
-                SliverToBoxAdapter(
+
+                SliverFillRemainingBoxAdapter(
                   child: SizedBox(
-                    height: 900.0, //TODO: Fix the height
+                    height: MediaQuery.of(context).size.height - 110,
                     child: NotificationListener<ScrollNotification>(
                       onNotification: (ScrollNotification notification) {
                         return _handlePageNotification(notification,
@@ -630,28 +724,29 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Positioned(
-            top: statusBarHeight,
-            left: 0.0,
-            child: IconTheme(
-              data: const IconThemeData(color: Colors.white),
-              child: SafeArea(
-                top: false,
-                bottom: false,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.exit_to_app,
-                    size: 36,
+          if (pagePosition == 0.0 || scrollPosition == 0.0)
+            Positioned(
+              top: statusBarHeight,
+              left: 0.0,
+              child: IconTheme(
+                data: const IconThemeData(color: Colors.white),
+                child: SafeArea(
+                  top: false,
+                  bottom: false,
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.exit_to_app,
+                      size: 36,
+                    ),
+                    tooltip: 'Logout',
+                    onPressed: () {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          '/studentLogin', (Route<dynamic> route) => false);
+                    },
                   ),
-                  tooltip: 'Logout',
-                  onPressed: () {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        '/studentLogin', (Route<dynamic> route) => false);
-                  },
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
