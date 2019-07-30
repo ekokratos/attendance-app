@@ -120,9 +120,15 @@ class _LecturerHomeState extends State<LecturerHome> {
                               ),
                             ),
                           ),
-                          Icon(
-                            Icons.description,
-                            color: Colors.black,
+                          Hero(
+                            tag: 'fileIcon',
+                            child: Material(
+                              color: Colors.transparent,
+                              child: Icon(
+                                Icons.description,
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
                         ],
                       ),

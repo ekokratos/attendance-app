@@ -57,7 +57,7 @@ class _LecturerLoginState extends State<LecturerLogin> {
                           children: <Widget>[
                             TextField(
                               decoration: InputDecoration(
-                                  labelText: 'USN',
+                                  labelText: 'UID',
                                   suffixIcon: Icon(Icons.person)),
                             ),
                             TextField(

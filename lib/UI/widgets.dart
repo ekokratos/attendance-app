@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'sections.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 const double kSectionIndicatorWidth = 32.0;
 
@@ -324,36 +326,116 @@ class MarksSectionDetailView extends StatelessWidget {
   }
 }
 
-class LetterSectionDetailView extends StatelessWidget {
-  final LetterDetail detail;
-  LetterSectionDetailView({this.detail});
+class LetterSectionDetailView extends StatefulWidget {
+  final Firestore firestore;
+  final String usn;
+  final String year;
+  final String branch;
+  final String section;
+  LetterSectionDetailView(
+      {this.firestore, this.branch, this.year, this.section, this.usn});
+  @override
+  _LetterSectionDetailViewState createState() =>
+      _LetterSectionDetailViewState();
+}
+
+class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
+  List<List<Row>> textFields = [[]];
 
   @override
   Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: widget.firestore
+          .collection(widget.branch + '-' + widget.year + '-' + widget.section)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.lightBlueAccent,
+            ),
+          );
+        }
+
+        final messages = snapshot.data.documents.reversed;
+
+        List<Padding> cardWidgets = [];
+        int i = 0;
+        for (var message in messages) {
+          if (message.documentID.substring(0, 10) == widget.usn) {
+            final title = message.data['title'];
+            final url = message.data['url'];
+
+            final card = buildPadding(
+                outIndex: i,
+                context: context,
+                title: title,
+                url: url,
+                instance: widget.firestore,
+                documentId: message.documentID);
+            cardWidgets.add(card);
+            textFields.add([]);
+            i = i + 1;
+          }
+        }
+        return Container(
+          height: MediaQuery.of(context).size.height - 110,
+          child: ListView(
+            physics: ClampingScrollPhysics(),
+            shrinkWrap: true,
+            children: cardWidgets,
+          ),
+        );
+      },
+    );
+  }
+
+  Padding buildPadding(
+      {int outIndex,
+      BuildContext context,
+      String title,
+      String url,
+      Firestore instance,
+      String documentId}) {
+    Text text = Text(
+      title,
+      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+    );
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 16),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
+        margin: EdgeInsets.symmetric(horizontal: 20),
         child: Card(
           elevation: 10,
           child: Padding(
-            padding: const EdgeInsets.only(left: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(
-                      detail.title,
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                    ),
+                    text,
                     PopupMenuButton(
                       onSelected: (value) async {
-                        if (value == 'Open')
-                          _launchURL(
-                              'http://docs.google.com/viewer?url=${detail.imageUrl}');
+                        StorageReference deleteRef = FirebaseStorage.instance
+                            .ref()
+                            .child(widget.usn + '-' + text.data);
+                        if (value == 'Open') {
+                          _launchURL('http://docs.google.com/viewer?url=$url');
+                        }
+                        if (value == 'Delete') {
+                          print('Delete');
+                          deleteRef.delete();
+                          instance
+                              .collection(widget.branch +
+                                  '-' +
+                                  widget.year +
+                                  '-' +
+                                  widget.section)
+                              .document(widget.usn + '-' + text.data)
+                              .delete();
+                        }
                       },
                       itemBuilder: (BuildContext context) => <PopupMenuEntry>[
                         const PopupMenuItem(
@@ -368,13 +450,61 @@ class LetterSectionDetailView extends StatelessWidget {
                     )
                   ],
                 ),
+                ListView.builder(
+                    physics: ClampingScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    itemCount: textFields[outIndex].length,
+                    itemBuilder: (context, int index) {
+                      return textFields[outIndex][index];
+                    }),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Text(
-                    'Add USN',
-                    style: TextStyle(color: Colors.orange, fontSize: 16),
+                  padding: EdgeInsets.symmetric(vertical: 24.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      GestureDetector(
+                        child: Text(
+                          'Add USN',
+                          style: TextStyle(color: Colors.orange, fontSize: 16),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            textFields[outIndex].add(
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: TextFormField(
+                                      decoration: InputDecoration(
+                                        labelText: 'USN',
+                                        focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.orange)),
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.cancel),
+                                    onPressed: () {
+                                      setState(() {
+                                        textFields[outIndex].removeLast();
+                                      });
+                                    },
+                                  )
+                                ],
+                              ),
+                            );
+                          });
+                        },
+                      ),
+                      RaisedButton(
+                        color: Colors.orange,
+                        child: Text('Submit'),
+                        onPressed: () {},
+                      )
+                    ],
                   ),
-                )
+                ),
               ],
             ),
           ),

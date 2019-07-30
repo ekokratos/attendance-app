@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'letter_list.dart';
 
 class Letters extends StatefulWidget {
   @override
@@ -15,38 +16,20 @@ class _LettersState extends State<Letters> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          actions: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: IconButton(
-                icon: Icon(Icons.close, size: 36),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            )
-          ],
           backgroundColor: Color(0x0E004D99),
           brightness: Brightness.dark,
           elevation: 0,
-          leading: Hero(
-            tag: 'signOutTag',
-            child: Material(
-              color: Colors.transparent,
-              child: IconButton(
-                  icon: Icon(Icons.exit_to_app),
-                  iconSize: 36,
-                  color: Colors.white,
-                  onPressed: () {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        '/lecturerLogin', (Route<dynamic> route) => false);
-                  }),
-            ),
-          ),
+          leading: IconButton(
+              icon: Icon(Icons.exit_to_app),
+              iconSize: 36,
+              onPressed: () {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/lecturerLogin', (Route<dynamic> route) => false);
+              }),
         ),
         backgroundColor: Color(0xDF004D99),
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -55,22 +38,42 @@ class _LettersState extends State<Letters> {
                 elevation: 10,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 32.0, vertical: 50),
+                      horizontal: 20.0, vertical: 50),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Hero(
-                        tag: 'letter',
-                        child: Text(
-                          'Letters  ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 32,
-                            fontFamily: "Roboto",
-                            color: Colors.black,
-                            decoration: TextDecoration.none,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Hero(
+                            tag: 'letter',
+                            child: Text(
+                              'Letters  ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 32,
+                                fontFamily: "Roboto",
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
                           ),
-                        ),
+                          Hero(
+                            tag: 'fileIcon',
+                            child: Material(
+                              color: Colors.transparent,
+                              child: IconButton(
+                                  icon: Icon(
+                                    Icons.clear,
+                                    size: 30,
+                                    color: Colors.black,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  }),
+                            ),
+                          )
+                        ],
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 16.0),
@@ -93,8 +96,7 @@ class _LettersState extends State<Letters> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.3,
+                            Expanded(
                               child: DropDownButton(
                                   hintText: 'Year',
                                   updatedValue: selectedYear,
@@ -105,8 +107,10 @@ class _LettersState extends State<Letters> {
                                     });
                                   }),
                             ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.3,
+                            SizedBox(
+                              width: 15,
+                            ),
+                            Expanded(
                               child: DropDownButton(
                                   hintText: 'Section',
                                   updatedValue: selectedSection,
@@ -123,7 +127,7 @@ class _LettersState extends State<Letters> {
                       DropDownButton(
                           hintText: 'Department',
                           updatedValue: selectedDept,
-                          dropdownValues: ['CSE', 'ISE', 'CV', 'ME', 'EC'],
+                          dropdownValues: ['CS', 'IS', 'CV', 'ME', 'EC'],
                           onChanged: (String newValue) {
                             setState(() {
                               selectedDept = newValue;
@@ -133,25 +137,42 @@ class _LettersState extends State<Letters> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: Hero(
-                  tag: 'letterButton',
-                  child: RaisedButton(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    color: Colors.blue,
-                    child: Text(
-                      'Check Letters',
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+              Hero(
+                tag: 'letterButton',
+                child: RaisedButton(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(
+                          Icons.volume_up,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          'Check Letters',
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                      ],
                     ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/letters_list');
-                    },
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50.0),
+                      borderRadius: BorderRadius.circular(30),
                     ),
-                  ),
-                ),
+                    color: Colors.lightBlueAccent,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => StudentList(
+                                  year: selectedYear,
+                                  department: selectedDept,
+                                  section: selectedSection,
+                                )),
+                      );
+                    }),
               ),
             ],
           ),
