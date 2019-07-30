@@ -34,9 +34,6 @@ dependencies:
 
   cloud_firestore: ^0.12.8+1
 
-  sliver_fill_remaining_box_adapter: ^0.1.1
-
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

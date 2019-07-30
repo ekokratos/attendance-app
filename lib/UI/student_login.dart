@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'home_page.dart';
 
 class StudentLogin extends StatefulWidget {
   @override
@@ -8,6 +9,17 @@ class StudentLogin extends StatefulWidget {
 class _StudentLoginState extends State<StudentLogin> {
   bool obscureText = true;
   String updatedValue;
+
+  final usnController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    usnController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -65,11 +77,13 @@ class _StudentLoginState extends State<StudentLogin> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
                             TextField(
+                              controller: usnController,
                               decoration: InputDecoration(
                                   labelText: 'USN',
                                   suffixIcon: Icon(Icons.person)),
                             ),
                             TextField(
+                              controller: passwordController,
                               obscureText: obscureText,
                               decoration: InputDecoration(
                                   labelText: 'Password',
@@ -118,8 +132,15 @@ class _StudentLoginState extends State<StudentLogin> {
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/home');
+                              onPressed: () async {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => HomePage(
+                                            usn: usnController.value.text,
+                                            section: updatedValue,
+                                          )),
+                                );
                               },
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(50.0),

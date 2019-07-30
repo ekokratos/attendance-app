@@ -328,19 +328,26 @@ class MarksSectionDetailView extends StatelessWidget {
 
 class LetterSectionDetailView extends StatefulWidget {
   final Firestore firestore;
-  LetterSectionDetailView({this.firestore});
+  final String usn;
+  final String year;
+  final String branch;
+  final String section;
+  LetterSectionDetailView(
+      {this.firestore, this.branch, this.year, this.section, this.usn});
   @override
   _LetterSectionDetailViewState createState() =>
       _LetterSectionDetailViewState();
 }
 
 class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
-  List<List<TextFormField>> textFields = [[]];
+  List<List<Row>> textFields = [[]];
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: widget.firestore.collection('Student').snapshots(),
+      stream: widget.firestore
+          .collection(widget.branch + '-' + widget.year + '-' + widget.section)
+          .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Center(
@@ -355,19 +362,21 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
         List<Padding> cardWidgets = [];
         int i = 0;
         for (var message in messages) {
-          final title = message.data['title'];
-          final url = message.data['url'];
+          if (message.documentID.substring(0, 10) == widget.usn) {
+            final title = message.data['title'];
+            final url = message.data['url'];
 
-          final card = buildPadding(
-              outIndex: i,
-              context: context,
-              title: title,
-              url: url,
-              instance: widget.firestore,
-              documentId: message.documentID);
-          cardWidgets.add(card);
-          textFields.add([]);
-          i = i + 1;
+            final card = buildPadding(
+                outIndex: i,
+                context: context,
+                title: title,
+                url: url,
+                instance: widget.firestore,
+                documentId: message.documentID);
+            cardWidgets.add(card);
+            textFields.add([]);
+            i = i + 1;
+          }
         }
         return Container(
           height: MediaQuery.of(context).size.height - 110,
@@ -409,8 +418,9 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
                     text,
                     PopupMenuButton(
                       onSelected: (value) async {
-                        StorageReference deleteRef =
-                            FirebaseStorage.instance.ref().child(text.data);
+                        StorageReference deleteRef = FirebaseStorage.instance
+                            .ref()
+                            .child(widget.usn + '-' + text.data);
                         if (value == 'Open') {
                           _launchURL('http://docs.google.com/viewer?url=$url');
                         }
@@ -418,8 +428,12 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
                           print('Delete');
                           deleteRef.delete();
                           instance
-                              .collection('Student')
-                              .document(text.data)
+                              .collection(widget.branch +
+                                  '-' +
+                                  widget.year +
+                                  '-' +
+                                  widget.section)
+                              .document(widget.usn + '-' + text.data)
                               .delete();
                         }
                       },
@@ -446,32 +460,49 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
                     }),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 24.0),
-                  child: GestureDetector(
-                    child: Text(
-                      'Add USN',
-                      style: TextStyle(color: Colors.orange, fontSize: 16),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        textFields[outIndex].add(
-                          TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'USN',
-                              focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.orange)),
-                              suffixIcon: IconButton(
-                                icon: Icon(Icons.cancel),
-                                onPressed: () {
-                                  setState(() {
-                                    textFields[outIndex].removeLast();
-                                  });
-                                },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      GestureDetector(
+                        child: Text(
+                          'Add USN',
+                          style: TextStyle(color: Colors.orange, fontSize: 16),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            textFields[outIndex].add(
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: TextFormField(
+                                      decoration: InputDecoration(
+                                        labelText: 'USN',
+                                        focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.orange)),
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.cancel),
+                                    onPressed: () {
+                                      setState(() {
+                                        textFields[outIndex].removeLast();
+                                      });
+                                    },
+                                  )
+                                ],
                               ),
-                            ),
-                          ),
-                        );
-                      });
-                    },
+                            );
+                          });
+                        },
+                      ),
+                      RaisedButton(
+                        color: Colors.orange,
+                        child: Text('Submit'),
+                        onPressed: () {},
+                      )
+                    ],
                   ),
                 ),
               ],

@@ -28,7 +28,7 @@ packages:
       name: cloud_firestore
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.8+1"
+    version: "0.12.9"
   collection:
     dependency: transitive
     description:
@@ -121,13 +121,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
-  sliver_fill_remaining_box_adapter:
-    dependency: "direct main"
-    description:
-      name: sliver_fill_remaining_box_adapter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.1"
   source_span:
     dependency: transitive
     description:

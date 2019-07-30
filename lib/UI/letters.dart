@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'letter_list.dart';
 
 class Letters extends StatefulWidget {
   @override
@@ -111,7 +112,7 @@ class _LettersState extends State<Letters> {
                       DropDownButton(
                           hintText: 'Department',
                           updatedValue: selectedDept,
-                          dropdownValues: ['CSE', 'ISE', 'CV', 'ME', 'EC'],
+                          dropdownValues: ['CS', 'IS', 'CV', 'ME', 'EC'],
                           onChanged: (String newValue) {
                             setState(() {
                               selectedDept = newValue;
@@ -145,7 +146,15 @@ class _LettersState extends State<Letters> {
                   ),
                   color: Colors.lightBlueAccent,
                   onPressed: () {
-                    Navigator.pushNamed(context, '/broadcast');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => StudentList(
+                                year: selectedYear,
+                                department: selectedDept,
+                                section: selectedSection,
+                              )),
+                    );
                   }),
             ],
           ),

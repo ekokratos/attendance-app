@@ -7,7 +7,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
-import 'package:sliver_fill_remaining_box_adapter/sliver_fill_remaining_box_adapter.dart';
 
 const Color _kAppBackgroundColor = Color(0xFF353662);
 const Duration _kScrollDuration = Duration(milliseconds: 400);
@@ -436,7 +435,9 @@ class _SnappingScrollPhysics extends ClampingScrollPhysics {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key key}) : super(key: key);
+  final String usn;
+  final String section;
+  HomePage({this.usn = '4SF16CS091', this.section = 'B'});
 
   static const String routeName = '/animation';
 
@@ -453,6 +454,8 @@ class _HomePageState extends State<HomePage> {
   final Section section = Section();
   final _firestore = Firestore.instance;
   Future<String> filePath;
+  int year;
+  String branch;
 
   double pagePosition = 0.0;
   double scrollPosition = 0.0;
@@ -467,6 +470,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    year = DateTime.now().year - int.parse('20' + widget.usn.substring(3, 5));
+    branch = widget.usn.substring(5, 7);
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: pagePosition == 2.0 && scrollPosition >= 90
@@ -506,7 +511,9 @@ class _HomePageState extends State<HomePage> {
                                     onPressed: () async {
                                       final StorageReference storageRef =
                                           FirebaseStorage.instance.ref().child(
-                                              titleController.value.text);
+                                              widget.usn +
+                                                  '-' +
+                                                  titleController.value.text);
                                       final StorageUploadTask uploadTask =
                                           storageRef
                                               .putFile(File(await filePath));
@@ -514,11 +521,15 @@ class _HomePageState extends State<HomePage> {
                                           (await uploadTask.onComplete);
                                       final String url = (await downloadUrl.ref
                                           .getDownloadURL());
-                                      print(
-                                          'Title is ${titleController.value.text} and URL Is $url');
                                       _firestore
-                                          .collection('Student')
-                                          .document(titleController.value.text)
+                                          .collection(branch +
+                                              '-' +
+                                              year.toString() +
+                                              '-' +
+                                              widget.section)
+                                          .document(widget.usn +
+                                              '-' +
+                                              titleController.value.text)
                                           .setData({
                                         'title': titleController.value.text,
                                         'url': url
@@ -603,8 +614,11 @@ class _HomePageState extends State<HomePage> {
       if (detail is MarksDetail) return MarksSectionDetailView(detail: detail);
       if (detail is LetterDetail)
         return LetterSectionDetailView(
-          firestore: _firestore,
-        );
+            firestore: _firestore,
+            usn: widget.usn,
+            branch: branch,
+            year: year.toString(),
+            section: widget.section);
       return null;
     });
     return ListTile.divideTiles(context: context, tiles: detailItems);
@@ -702,7 +716,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 // Details
 
-                SliverFillRemainingBoxAdapter(
+                SliverToBoxAdapter(
                   child: SizedBox(
                     height: MediaQuery.of(context).size.height - 110,
                     child: NotificationListener<ScrollNotification>(
