@@ -56,8 +56,6 @@ class StudentList extends StatelessWidget {
             for (var message in messages) {
               if (!usnList.contains(message.documentID.substring(0, 10))) {
                 usnList.add(message.documentID.substring(0, 10));
-                final title = message.data['title'];
-                final url = message.data['url'];
 
                 final card =
                     letterCard(context: context, id: message.documentID);
