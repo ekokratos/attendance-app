@@ -76,20 +76,23 @@ class _LecturerLoginState extends State<LecturerLogin> {
                                     },
                                   )),
                             ),
-                            RaisedButton(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 18, horizontal: 95),
-                              color: Color(0xDF004D99),
-                              child: Text(
-                                'Sign In',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 20),
-                              ),
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/lecturerHome');
-                              },
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50.0),
+                            Hero(
+                              tag: 'lecturerButton',
+                              child: RaisedButton(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 18, horizontal: 95),
+                                color: Color(0xDF004D99),
+                                child: Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/lecturerHome');
+                                },
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50.0),
+                                ),
                               ),
                             )
                           ],

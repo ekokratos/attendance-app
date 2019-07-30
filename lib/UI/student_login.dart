@@ -109,20 +109,23 @@ class _StudentLoginState extends State<StudentLogin> {
                                 );
                               }).toList(),
                             ),
-                            RaisedButton(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 18, horizontal: 90),
-                              color: Colors.blue,
-                              child: Text(
-                                'Sign In',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 20),
-                              ),
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/home');
-                              },
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50.0),
+                            Hero(
+                              tag: 'studentButton',
+                              child: RaisedButton(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 18, horizontal: 90),
+                                color: Colors.blue,
+                                child: Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/home');
+                                },
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50.0),
+                                ),
                               ),
                             )
                           ],

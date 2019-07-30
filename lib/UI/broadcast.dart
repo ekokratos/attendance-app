@@ -6,9 +6,9 @@ class Broadcast extends StatefulWidget {
 }
 
 class _BroadcastState extends State<Broadcast> {
-  String year;
-  String section;
-  String dept;
+  String selectedYear;
+  String selectedSection;
+  String selectedDept;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -17,13 +17,20 @@ class _BroadcastState extends State<Broadcast> {
           backgroundColor: Color(0x0E004D99),
           brightness: Brightness.dark,
           elevation: 0,
-          leading: IconButton(
-              icon: Icon(Icons.exit_to_app),
-              iconSize: 36,
-              onPressed: () {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/lecturerLogin', (Route<dynamic> route) => false);
-              }),
+          leading: Hero(
+            tag: 'signOutTag',
+            child: Material(
+              color: Colors.transparent,
+              child: IconButton(
+                  icon: Icon(Icons.exit_to_app),
+                  iconSize: 36,
+                  color: Colors.white,
+                  onPressed: () {
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        '/lecturerLogin', (Route<dynamic> route) => false);
+                  }),
+            ),
+          ),
         ),
         backgroundColor: Color(0xDF004D99),
         body: ListView(
@@ -48,19 +55,31 @@ class _BroadcastState extends State<Broadcast> {
                               Hero(
                                 tag: 'broadcastText',
                                 child: Text(
-                                  'Broadcast',
+                                  'Broadcast  ',
                                   style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 24),
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 24,
+                                    fontFamily: "Roboto",
+                                    color: Colors.black,
+                                    decoration: TextDecoration.none,
+                                  ),
                                 ),
                               ),
-                              IconButton(
-                                  icon: Icon(
-                                    Icons.clear,
-                                    size: 30,
-                                    color: Colors.black,
-                                  ),
-                                  onPressed: () {})
+                              Hero(
+                                tag: 'broadcastIcon',
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: IconButton(
+                                      icon: Icon(
+                                        Icons.clear,
+                                        size: 30,
+                                        color: Colors.black,
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      }),
+                                ),
+                              )
                             ],
                           ),
                           Padding(
@@ -90,11 +109,11 @@ class _BroadcastState extends State<Broadcast> {
                                     'Year',
                                     style: TextStyle(fontSize: 18),
                                   ),
-                                  value: year,
+                                  value: selectedYear,
                                   icon: Icon(Icons.keyboard_arrow_down),
                                   onChanged: (String newValue) {
                                     setState(() {
-                                      year = newValue;
+                                      selectedYear = newValue;
                                     });
                                   },
                                   items: ['1', '2', '3', '4']
@@ -117,11 +136,11 @@ class _BroadcastState extends State<Broadcast> {
                                     'Section',
                                     style: TextStyle(fontSize: 18),
                                   ),
-                                  value: section,
+                                  value: selectedSection,
                                   icon: Icon(Icons.keyboard_arrow_down),
                                   onChanged: (String newValue) {
                                     setState(() {
-                                      section = newValue;
+                                      selectedSection = newValue;
                                     });
                                   },
                                   items: ['A', 'B', 'C']
@@ -145,11 +164,11 @@ class _BroadcastState extends State<Broadcast> {
                               'Dept.',
                               style: TextStyle(fontSize: 18),
                             ),
-                            value: dept,
+                            value: selectedDept,
                             icon: Icon(Icons.keyboard_arrow_down),
                             onChanged: (String newValue) {
                               setState(() {
-                                dept = newValue;
+                                selectedDept = newValue;
                               });
                             },
                             items: ['CSE', 'CIV', 'ECE', 'ISE', 'MECH']
@@ -167,33 +186,35 @@ class _BroadcastState extends State<Broadcast> {
                   SizedBox(
                     height: 30,
                   ),
-                  RaisedButton(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Icon(
-                            Icons.volume_up,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            'Send Broadcast',
-                            style: TextStyle(color: Colors.white, fontSize: 20),
-                          ),
-                        ],
-                      ),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      color: Colors.lightBlueAccent,
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/broadcast');
-                      })
+                  Hero(
+                    tag: 'broadcastButton',
+                    child: RaisedButton(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(
+                              Icons.volume_up,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              'Send Broadcast',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          ],
+                        ),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        color: Colors.lightBlueAccent,
+                        onPressed: () {}),
+                  )
                 ],
               ),
             ),

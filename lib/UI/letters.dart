@@ -29,34 +29,47 @@ class _LettersState extends State<Letters> {
           backgroundColor: Color(0x0E004D99),
           brightness: Brightness.dark,
           elevation: 0,
-          leading: IconButton(
-              icon: Icon(Icons.exit_to_app),
-              iconSize: 36,
-              onPressed: () {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/lecturerLogin', (Route<dynamic> route) => false);
-              }),
+          leading: Hero(
+            tag: 'signOutTag',
+            child: Material(
+              color: Colors.transparent,
+              child: IconButton(
+                  icon: Icon(Icons.exit_to_app),
+                  iconSize: 36,
+                  color: Colors.white,
+                  onPressed: () {
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        '/lecturerLogin', (Route<dynamic> route) => false);
+                  }),
+            ),
+          ),
         ),
         backgroundColor: Color(0xDF004D99),
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               Card(
                 elevation: 10,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 32.0, vertical: 20),
+                      horizontal: 32.0, vertical: 50),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
-                        'Letters',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 32,
+                      Hero(
+                        tag: 'letter',
+                        child: Text(
+                          'Letters  ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 32,
+                            fontFamily: "Roboto",
+                            color: Colors.black,
+                            decoration: TextDecoration.none,
+                          ),
                         ),
                       ),
                       Padding(
@@ -122,18 +135,21 @@ class _LettersState extends State<Letters> {
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
-                child: RaisedButton(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  color: Colors.blue,
-                  child: Text(
-                    'Check Letters',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/letters_list');
-                  },
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50.0),
+                child: Hero(
+                  tag: 'letterButton',
+                  child: RaisedButton(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    color: Colors.blue,
+                    child: Text(
+                      'Check Letters',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/letters_list');
+                    },
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50.0),
+                    ),
                   ),
                 ),
               ),

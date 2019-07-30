@@ -43,33 +43,40 @@ class WelcomePage extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 120.0, bottom: 50.0),
+                child: Hero(
+                  tag: 'studentButton',
+                  child: RaisedButton(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 18, horizontal: 110),
+                    color: Colors.blue,
+                    child: Text(
+                      'Student',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/studentLogin');
+                    },
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50.0),
+                    ),
+                  ),
+                ),
+              ),
+              Hero(
+                tag: 'lecturerButton',
                 child: RaisedButton(
                   padding: EdgeInsets.symmetric(vertical: 18, horizontal: 110),
-                  color: Colors.blue,
+                  color: Color(0xD0004D99),
                   child: Text(
-                    'Student',
+                    'Lecturer',
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context, '/studentLogin');
+                    Navigator.pushNamed(context, '/lecturerLogin');
                   },
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50.0),
                   ),
-                ),
-              ),
-              RaisedButton(
-                padding: EdgeInsets.symmetric(vertical: 18, horizontal: 110),
-                color: Color(0xD0004D99),
-                child: Text(
-                  'Lecturer',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/lecturerLogin');
-                },
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50.0),
                 ),
               )
             ],
@@ -89,13 +96,16 @@ class ShapesPainter extends CustomPainter {
     );
 
     final Gradient gradient = new LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        const Color(0xC00093E9),
-        const Color(0xF580D0C7),
-      ],
-    );
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFA2196F3), // Colors.
+          const Color(0xEA004D99),
+        ],
+        stops: [
+          0.5,
+          0.8
+        ]);
 
     // create the Shader from the gradient and the bounding square
     final Paint paint = new Paint()..shader = gradient.createShader(rect);
@@ -107,3 +117,6 @@ class ShapesPainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
+
+//const Color(0xC00093E9),
+//const Color(0xF580D0C7),
