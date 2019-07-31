@@ -6,9 +6,16 @@ class Broadcast extends StatefulWidget {
 }
 
 class _BroadcastState extends State<Broadcast> {
+  final GlobalKey _snackbarKey = GlobalKey<FormState>();
+  final titleController = TextEditingController();
+  final messageController = TextEditingController();
+
   String selectedYear;
   String selectedSection;
   String selectedDept;
+  String _title;
+  String _message;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -34,6 +41,7 @@ class _BroadcastState extends State<Broadcast> {
         ),
         backgroundColor: Color(0xDF004D99),
         body: ListView(
+          key: _snackbarKey,
           children: <Widget>[
             Padding(
               padding:
@@ -91,10 +99,12 @@ class _BroadcastState extends State<Broadcast> {
                           ),
                           TextFormField(
                             decoration: InputDecoration(labelText: 'Title'),
+                            controller: titleController,
                             maxLength: 25,
                           ),
                           TextFormField(
                             decoration: InputDecoration(labelText: 'Message'),
+                            controller: messageController,
                             maxLength: 90,
                           ),
                           SizedBox(
@@ -213,7 +223,21 @@ class _BroadcastState extends State<Broadcast> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                         color: Colors.lightBlueAccent,
-                        onPressed: () {}),
+                        onPressed: () {
+                          if (selectedDept != null &&
+                              selectedYear != null &&
+                              selectedSection != null &&
+                              messageController.text.isNotEmpty &&
+                              titleController.text.isNotEmpty) {
+                            print('Ta-da!');
+                          } else
+                            Scaffold.of(_snackbarKey.currentContext)
+                                .showSnackBar(
+                              SnackBar(
+                                content: Text('Please enter all details.'),
+                              ),
+                            );
+                        }),
                   )
                 ],
               ),

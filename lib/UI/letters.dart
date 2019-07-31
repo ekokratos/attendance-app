@@ -7,6 +7,8 @@ class Letters extends StatefulWidget {
 }
 
 class _LettersState extends State<Letters> {
+  final GlobalKey _snackbarKey = GlobalKey<FormState>();
+
   String selectedYear;
   String selectedSection;
   String selectedDept;
@@ -31,6 +33,7 @@ class _LettersState extends State<Letters> {
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
+            key: _snackbarKey,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -144,7 +147,7 @@ class _LettersState extends State<Letters> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Icon(
-                          Icons.volume_up,
+                          Icons.description,
                           color: Colors.white,
                           size: 30,
                         ),
@@ -163,15 +166,25 @@ class _LettersState extends State<Letters> {
                     ),
                     color: Colors.lightBlueAccent,
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => StudentList(
-                                  year: selectedYear,
-                                  department: selectedDept,
-                                  section: selectedSection,
-                                )),
-                      );
+                      if (selectedDept != null &&
+                          selectedYear != null &&
+                          selectedSection != null)
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => StudentList(
+                                    year: selectedYear,
+                                    department: selectedDept,
+                                    section: selectedSection,
+                                  )),
+                        );
+                      else {
+                        Scaffold.of(_snackbarKey.currentContext).showSnackBar(
+                          SnackBar(
+                            content: Text('Please enter all details.'),
+                          ),
+                        );
+                      }
                     }),
               ),
             ],
