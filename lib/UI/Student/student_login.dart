@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'student_homepage.dart';
 
 class StudentLogin extends StatefulWidget {
   @override
@@ -35,14 +35,6 @@ class _StudentLoginState extends State<StudentLogin> {
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
                         color: Color(0xFF2196F3),
-//                        gradient: LinearGradient(
-//                          begin: Alignment.topLeft,
-//                          end: Alignment.bottomRight,
-//                          colors: [
-//                            const Color(0xFF2196F3),
-//                            const Color(0xF580D0C7)
-//                          ], // whitish to gray
-//                        ),
                       ),
                       child: Center(
                         child: Container(
@@ -138,7 +130,7 @@ class _StudentLoginState extends State<StudentLogin> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => HomePage(
+                                        builder: (context) => StudentHome(
                                               usn: usnController
                                                       .value.text.isEmpty
                                                   ? '4SF16CS091'

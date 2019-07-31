@@ -1,331 +1,9 @@
 import 'package:flutter/material.dart';
-import 'sections.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-
-const double kSectionIndicatorWidth = 32.0;
-
-// The card for a single section. Displays the section's gradient and background image.
-class SectionCard extends StatelessWidget {
-  const SectionCard({Key key, @required this.section})
-      : assert(section != null),
-        super(key: key);
-
-  final Section section;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      label: section.title,
-      button: true,
-      child: DecoratedBox(
-          decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[
-            section.leftColor,
-            section.rightColor,
-          ],
-        ),
-      )),
-    );
-  }
-}
-
-// The title is rendered with two overlapping text widgets that are vertically
-// offset a little. It's supposed to look sort-of 3D.
-class SectionTitle extends StatelessWidget {
-  const SectionTitle({
-    Key key,
-    @required this.section,
-    @required this.scale,
-    @required this.opacity,
-  })  : assert(section != null),
-        assert(scale != null),
-        assert(opacity != null && opacity >= 0.0 && opacity <= 1.0),
-        super(key: key);
-
-  final Section section;
-  final double scale;
-  final double opacity;
-
-  static const TextStyle sectionTitleStyle = TextStyle(
-    fontFamily: 'Raleway',
-    inherit: false,
-    fontSize: 24.0,
-    fontWeight: FontWeight.w500,
-    color: Colors.white,
-    textBaseline: TextBaseline.alphabetic,
-  );
-
-  static final TextStyle sectionTitleShadowStyle = sectionTitleStyle.copyWith(
-    color: const Color(0x19000000),
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: Opacity(
-        opacity: opacity,
-        child: Transform(
-          transform: Matrix4.identity()..scale(scale),
-          alignment: Alignment.center,
-          child: Stack(
-            children: <Widget>[
-              Positioned(
-                top: 4.0,
-                child: Text(section.title, style: sectionTitleShadowStyle),
-              ),
-              Text(section.title, style: sectionTitleStyle),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Small horizontal bar that indicates the selected section.
-class SectionIndicator extends StatelessWidget {
-  const SectionIndicator({Key key, this.opacity = 1.0}) : super(key: key);
-
-  final double opacity;
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: Container(
-        width: kSectionIndicatorWidth,
-        height: 3.0,
-        color: Colors.white.withOpacity(opacity),
-      ),
-    );
-  }
-}
-
-// Display a single SectionDetail.
-class AttendanceSectionDetailView extends StatelessWidget {
-  final AttendanceDetail detail;
-  AttendanceSectionDetailView({this.detail});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        child: Card(
-          elevation: 10,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Text(
-                    detail.subject,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      detail.subjectCode,
-                      style: TextStyle(color: Colors.grey, fontSize: 16),
-                    ),
-                    Text(
-                      '${detail.percentage.floor().toString()} %',
-                      style: TextStyle(
-                          color: detail.percentage.floor() > 85
-                              ? Colors.green
-                              : Colors.red,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: LinearPercentIndicator(
-                    animation: true,
-                    lineHeight: 25.0,
-                    animationDuration: 2000,
-                    percent: detail.percentage / 100,
-                    center: Text(
-                      '${detail.attendedClasses}/${detail.numOfClasses}',
-                    ),
-                    linearStrokeCap: LinearStrokeCap.roundAll,
-                    linearGradient: detail.percentage.floor() > 85
-                        ? LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              const Color(0xFF60FE26),
-                              const Color(0xFFB9FF2C)
-                            ],
-                          )
-                        : LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              const Color(0xFFFF0045),
-                              const Color(0xFFFF2C71)
-                            ],
-                          ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class MarksSectionDetailView extends StatelessWidget {
-  final MarksDetail detail;
-  MarksSectionDetailView({this.detail});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        child: Card(
-          elevation: 10,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Text(
-                    detail.subject,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      width: 160,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Text(
-                            'IA1',
-                            style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16),
-                          ),
-                          Text(
-                            'IA2',
-                            style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16),
-                          ),
-                          Text(
-                            'IA3',
-                            style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16),
-                          )
-                        ],
-                      ),
-                    ),
-                    Text(
-                      'Average',
-                      style: TextStyle(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16),
-                    )
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Container(
-                        width: 160,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Text(
-                              detail.firstIA != -1
-                                  ? detail.firstIA.toString()
-                                  : 'AB',
-                              style: TextStyle(
-                                  color: detail.firstIA != -1
-                                      ? Colors.orange
-                                      : Colors.red,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16),
-                            ),
-                            Text(
-                              detail.secondIA != -1
-                                  ? detail.secondIA.toString()
-                                  : 'AB',
-                              style: TextStyle(
-                                  color: detail.secondIA != -1
-                                      ? Colors.orange
-                                      : Colors.red,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16),
-                            ),
-                            Text(
-                              detail.thirdIA != -1
-                                  ? detail.thirdIA.toString()
-                                  : 'AB',
-                              style: TextStyle(
-                                  color: detail.thirdIA != -1
-                                      ? Colors.orange
-                                      : Colors.red,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 20.0),
-                        child: Text(
-                          detail.average != -1
-                              ? detail.average.floor().toString()
-                              : 'AB',
-                          style: TextStyle(
-                              color: detail.average != -1 &&
-                                      detail.average.floor() > 7
-                                  ? Colors.orange
-                                  : Colors.red,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
 
 // -----------------------------------------------------------------------------
 class LetterSectionDetailView extends StatefulWidget {
@@ -349,6 +27,14 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
 
   /// --------------------------------------------------------------------------
   List<bool> isUsnListVisible = [false];
+  final titleController = TextEditingController();
+  Future<String> filePath;
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    super.dispose();
+  }
 
   // ---------------------------------------------------------------------------
   /// StreamBuilder used to build the cards
@@ -356,53 +42,168 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
   /// Eg: CS-3-B
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: widget.firestore
-          .collection(widget.branch + '-' + widget.year + '-' + widget.section)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.lightBlueAccent,
-            ),
-          );
-        }
-
-        // Sort the documents from first to last
-        final messages = snapshot.data.documents.reversed;
-
-        List<Padding> cardWidgets = [];
-        int i = 0;
-        for (var message in messages) {
-          if (message.documentID.substring(0, 10) == widget.usn) {
-            final title = message.data['title'];
-            final url = message.data['url'];
-
-            final card = buildCard(
-                outIndex: i,
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Color(0xFF24323F),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            showDialog(
                 context: context,
-                title: title,
-                url: url,
-                instance: widget.firestore,
-                documentId: message.documentID);
-            cardWidgets.add(card);
-            textFields.add([]); // TODO
-            textFieldController.add([]);
-            isUsnListVisible.add(false);
-            innerIndex.add(0);
-            i = i + 1;
-          }
-        }
-        return Container(
-          height: MediaQuery.of(context).size.height - 110,
-          child: ListView(
-            physics: ClampingScrollPhysics(),
-            shrinkWrap: true,
-            children: cardWidgets,
-          ),
-        );
-      },
+                builder: (_) => AlertDialog(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text("Add Letter"),
+                      content: Container(
+                          height: 230,
+                          child: Column(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                    24.0, 20.0, 24.0, 12.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    TextFormField(
+                                      controller: titleController,
+                                      decoration:
+                                          InputDecoration(labelText: 'Title'),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16.0),
+                                      child: RaisedButton(
+                                        child: Text('Select a file'),
+                                        color: Colors.grey[300],
+                                        onPressed: () {
+                                          filePath = FilePicker.getFilePath(
+                                              type: FileType.CUSTOM,
+                                              fileExtension: 'pdf');
+                                        },
+                                      ),
+                                    ),
+                                    Center(
+                                      child: RaisedButton(
+                                        child: Text('Submit'),
+                                        color: Colors.orange,
+                                        onPressed: () async {
+                                          Center(
+                                              child: CircularProgressIndicator(
+                                            backgroundColor:
+                                                Colors.lightBlueAccent,
+                                          ));
+                                          final StorageReference storageRef =
+                                              FirebaseStorage.instance
+                                                  .ref()
+                                                  .child(widget.usn +
+                                                      '-' +
+                                                      titleController
+                                                          .value.text);
+                                          final StorageUploadTask uploadTask =
+                                              storageRef.putFile(
+                                                  File(await filePath));
+                                          uploadTask.events
+                                              .listen((event) {})
+                                              .onError((error) {
+                                            final snackBar = SnackBar(
+                                                content: Text(
+                                                    'Oops! Something went wrong'));
+                                            Scaffold.of(context)
+                                                .showSnackBar(snackBar);
+                                          });
+                                          StorageTaskSnapshot downloadUrl =
+                                              (await uploadTask.onComplete);
+                                          final String url = (await downloadUrl
+                                              .ref
+                                              .getDownloadURL());
+                                          widget.firestore
+                                              .collection(widget.branch +
+                                                  '-' +
+                                                  widget.year.toString() +
+                                                  '-' +
+                                                  widget.section)
+                                              .document(widget.usn +
+                                                  '-' +
+                                                  titleController.value.text)
+                                              .setData({
+                                            'title': titleController.value.text,
+                                            'url': url,
+                                            'usn': []
+                                          });
+                                          titleController.clear();
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )
+                            ],
+                          )),
+                    ));
+          },
+          child: Icon(Icons.add),
+        ),
+        appBar: AppBar(
+          backgroundColor: Color(0xFF24323F),
+          leading: IconButton(
+              icon: Icon(
+                Icons.clear,
+                size: 32,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          title: Text('LETTERS'),
+        ),
+        body: StreamBuilder<QuerySnapshot>(
+          stream: widget.firestore
+              .collection(
+                  widget.branch + '-' + widget.year + '-' + widget.section)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.lightBlueAccent,
+                ),
+              );
+            }
+
+            // Sort the documents from first to last
+            final messages = snapshot.data.documents.reversed;
+
+            List<Padding> cardWidgets = [];
+            int i = 0;
+            for (var message in messages) {
+              if (message.documentID.substring(0, 10) == widget.usn) {
+                final title = message.data['title'];
+                final url = message.data['url'];
+
+                final card = buildCard(
+                    outIndex: i,
+                    context: context,
+                    title: title,
+                    url: url,
+                    instance: widget.firestore,
+                    documentId: message.documentID);
+                cardWidgets.add(card);
+                textFields.add([]); // TODO
+                textFieldController.add([]);
+                isUsnListVisible.add(false);
+                innerIndex.add(0);
+                i = i + 1;
+              }
+            }
+            return Container(
+              height: MediaQuery.of(context).size.height - 110,
+              child: ListView(
+                physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
+                children: cardWidgets,
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -762,110 +563,3 @@ _launchURL(String url) async {
 }
 
 // -----------------------------------------------------------------------------
-class NotificationSectionDetailView extends StatefulWidget {
-  final FirebaseMessaging firebaseMessaging;
-  NotificationSectionDetailView({this.firebaseMessaging});
-  @override
-  _NotificationSectionDetailViewState createState() =>
-      _NotificationSectionDetailViewState();
-}
-
-class _NotificationSectionDetailViewState
-    extends State<NotificationSectionDetailView> {
-  List<NotificationCard> notifications = new List<NotificationCard>();
-
-  @override
-  void initState() {
-    super.initState();
-
-    widget.firebaseMessaging.subscribeToTopic("4BCSE");
-
-    widget.firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        print("onMessage: $message");
-        setState(() {
-          notifications.add(NotificationCard(
-            title: message['data']['title'],
-            lecturerName: "Lecturer Name",
-            messageBody: message['data']['body'],
-          ));
-        });
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
-        setState(() {
-          notifications.add(NotificationCard(
-            title: message['data']['title'],
-            lecturerName: "Lecturer Name",
-            messageBody: message['data']['body'],
-          ));
-        });
-      },
-      onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message");
-        setState(() {
-          notifications.add(NotificationCard(
-            title: message['data']['title'],
-            lecturerName: "Lecturer Name",
-            messageBody: message['data']['body'],
-          ));
-        });
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height - 110,
-      padding: EdgeInsets.all(10.0),
-      child: ListView.builder(
-        itemCount: notifications.length,
-        itemBuilder: (context, int index) {
-          notifications[index].deleteFunction = () {
-            setState(() {
-              notifications.removeAt(index);
-            });
-          };
-          return notifications[index];
-        },
-      ),
-    );
-  }
-}
-
-class NotificationCard extends StatelessWidget {
-  final String title;
-  final String messageBody;
-  final String lecturerName;
-  Function deleteFunction;
-  NotificationCard({this.title, this.messageBody, this.lecturerName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 5.0,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              children: <Widget>[
-                Text("$title - $lecturerName",
-                    style:
-                        TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
-                SizedBox(height: 10.0),
-                Text(messageBody)
-              ],
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.cancel),
-            onPressed: deleteFunction,
-          )
-        ],
-      ),
-    );
-  }
-}
