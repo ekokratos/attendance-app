@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
-import 'dart:io';
+import 'letter_details.dart';
 
 // -----------------------------------------------------------------------------
 class LetterSectionDetailView extends StatefulWidget {
-  final Firestore firestore;
+  Firestore firestore;
   final String usn;
   final String year;
   final String branch;
   final String section;
   LetterSectionDetailView(
-      {this.firestore, this.branch, this.year, this.section, this.usn});
+      {this.firestore,
+      this.branch = 'CS',
+      this.year = '3',
+      this.section = 'B',
+      this.usn = '4SF16CS091'});
   @override
   _LetterSectionDetailViewState createState() =>
       _LetterSectionDetailViewState();
@@ -27,14 +30,6 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
 
   /// --------------------------------------------------------------------------
   List<bool> isUsnListVisible = [false];
-  final titleController = TextEditingController();
-  Future<String> filePath;
-
-  @override
-  void dispose() {
-    titleController.dispose();
-    super.dispose();
-  }
 
   // ---------------------------------------------------------------------------
   /// StreamBuilder used to build the cards
@@ -42,103 +37,25 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
   /// Eg: CS-3-B
   @override
   Widget build(BuildContext context) {
+    widget.firestore =
+        widget.firestore == null ? Firestore.instance : widget.firestore;
     return SafeArea(
       child: Scaffold(
         backgroundColor: Color(0xFF24323F),
         floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text("Add Letter"),
-                      content: Container(
-                          height: 230,
-                          child: Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                    24.0, 20.0, 24.0, 12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    TextFormField(
-                                      controller: titleController,
-                                      decoration:
-                                          InputDecoration(labelText: 'Title'),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 16.0),
-                                      child: RaisedButton(
-                                        child: Text('Select a file'),
-                                        color: Colors.grey[300],
-                                        onPressed: () {
-                                          filePath = FilePicker.getFilePath(
-                                              type: FileType.CUSTOM,
-                                              fileExtension: 'pdf');
-                                        },
-                                      ),
-                                    ),
-                                    Center(
-                                      child: RaisedButton(
-                                        child: Text('Submit'),
-                                        color: Colors.orange,
-                                        onPressed: () async {
-                                          Center(
-                                              child: CircularProgressIndicator(
-                                            backgroundColor:
-                                                Colors.lightBlueAccent,
-                                          ));
-                                          final StorageReference storageRef =
-                                              FirebaseStorage.instance
-                                                  .ref()
-                                                  .child(widget.usn +
-                                                      '-' +
-                                                      titleController
-                                                          .value.text);
-                                          final StorageUploadTask uploadTask =
-                                              storageRef.putFile(
-                                                  File(await filePath));
-                                          uploadTask.events
-                                              .listen((event) {})
-                                              .onError((error) {
-                                            final snackBar = SnackBar(
-                                                content: Text(
-                                                    'Oops! Something went wrong'));
-                                            Scaffold.of(context)
-                                                .showSnackBar(snackBar);
-                                          });
-                                          StorageTaskSnapshot downloadUrl =
-                                              (await uploadTask.onComplete);
-                                          final String url = (await downloadUrl
-                                              .ref
-                                              .getDownloadURL());
-                                          widget.firestore
-                                              .collection(widget.branch +
-                                                  '-' +
-                                                  widget.year.toString() +
-                                                  '-' +
-                                                  widget.section)
-                                              .document(widget.usn +
-                                                  '-' +
-                                                  titleController.value.text)
-                                              .setData({
-                                            'title': titleController.value.text,
-                                            'url': url,
-                                            'usn': []
-                                          });
-                                          titleController.clear();
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
-                          )),
-                    ));
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LetterDetails(
+                  firestore: widget.firestore,
+                  branch: widget.branch,
+                  year: widget.year,
+                  section: widget.section,
+                  usn: widget.usn,
+                ),
+              ),
+            );
           },
           child: Icon(Icons.add),
         ),
@@ -177,12 +94,20 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
               if (message.documentID.substring(0, 10) == widget.usn) {
                 final title = message.data['title'];
                 final url = message.data['url'];
+                final fromDate = message.data['from'];
+                final toDate = message.data['to'];
+                final category = message.data['category'];
+                final outcome = message.data['outcome'];
 
                 final card = buildCard(
                     outIndex: i,
                     context: context,
                     title: title,
                     url: url,
+                    from: fromDate,
+                    to: toDate,
+                    category: category,
+                    outcome: outcome,
                     instance: widget.firestore,
                     documentId: message.documentID);
                 cardWidgets.add(card);
@@ -215,7 +140,11 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
       String title,
       String url,
       Firestore instance,
-      String documentId}) {
+      String documentId,
+      String from,
+      String to,
+      String category,
+      String outcome}) {
     /// Storing title in [text] to use later
     Text text = Text(
       title,
@@ -509,6 +438,10 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
                                     .setData({
                                   'title': text.data,
                                   'url': url,
+                                  'from': from,
+                                  'to': to,
+                                  'category': category,
+                                  'outcome': outcome,
                                   'usn': []
                                 });
 
@@ -521,8 +454,6 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
                                         widget.section)
                                     .document(widget.usn + '-' + text.data)
                                     .updateData({
-                                  'title': text.data,
-                                  'url': url,
                                   'usn': FieldValue.arrayUnion(usnList)
                                 });
 

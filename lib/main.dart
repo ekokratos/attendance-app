@@ -7,6 +7,7 @@ import 'UI/Lecturer/lecturer_homepage.dart';
 import 'UI/Lecturer/letters.dart';
 import 'UI/Lecturer/letter_list.dart';
 import 'UI/Lecturer/broadcast.dart';
+import 'UI/Student/student_letters.dart';
 
 void main() => runApp(MyApp());
 
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/',
+      initialRoute: '/letters',
       routes: {
         '/': (context) => WelcomePage(),
         '/studentLogin': (context) => StudentLogin(),
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
         '/letters': (context) => Letters(),
         '/letters_list': (context) => LetterList(),
         '/broadcast': (context) => Broadcast(),
+        '/studentLetters': (context) => LetterSectionDetailView()
       },
     );
   }

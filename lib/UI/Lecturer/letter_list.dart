@@ -4,6 +4,21 @@ import 'package:url_launcher/url_launcher.dart';
 
 final _firestore = Firestore.instance;
 
+List<String> months = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec'
+];
+
 class StudentList extends StatelessWidget {
   StudentList({this.year, this.section, this.department});
   final String year;
@@ -175,11 +190,17 @@ class LetterList extends StatelessWidget {
               if (message.documentID.substring(0, 10) == usn) {
                 final title = message.data['title'];
                 final url = message.data['url'];
+                final category = message.data['category'];
+                final fromDate = message.data['from'];
+                final toDate = message.data['to'];
 
                 final card = letterCard(
                     context: context,
                     title: title,
                     url: url,
+                    from: fromDate,
+                    to: toDate,
+                    category: category,
                     instance: _firestore,
                     id: message.documentID);
                 cardWidgets.add(card);
@@ -204,7 +225,20 @@ class LetterList extends StatelessWidget {
       String url,
       String title,
       String id,
+      String category,
+      String from,
+      String to,
       Firestore instance}) {
+    RegExp dateRegex = RegExp('([0-9]+)-[0-9]+');
+    String fromDate = dateRegex.firstMatch(from).group(1);
+    String toDate = dateRegex.firstMatch(to).group(1);
+
+    RegExp regex = RegExp('[0-9]+-([0-9]+)');
+    int fromMonth = int.parse(regex.firstMatch(from).group(1));
+    int toMonth = int.parse(regex.firstMatch(to).group(1));
+
+    RegExp yearRegex = RegExp('-[0-9]+([0-9]{2})\$');
+    String year = yearRegex.firstMatch(from).group(1);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Center(
@@ -219,9 +253,37 @@ class LetterList extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    title,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        title,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Text(
+                            fromDate +
+                                '-' +
+                                months[fromMonth - 1] +
+                                ' \'' +
+                                year,
+                            style: TextStyle(
+                                fontSize: 16, color: Color(0xDF004D99)),
+                          ),
+                          Text(
+                            ' to ',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          Text(
+                            toDate + '-' + months[toMonth - 1] + ' \'' + year,
+                            style: TextStyle(
+                                fontSize: 16, color: Color(0xDF004D99)),
+                          )
+                        ],
+                      )
+                    ],
                   ),
                   Text(
                     id.substring(0, 10),
@@ -230,18 +292,41 @@ class LetterList extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         fontSize: 16),
                   ),
-                  GestureDetector(
-                    child: Text(
-                      'View',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xDF004D99),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      GestureDetector(
+                        child: Text(
+                          'View',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xDF004D99),
+                          ),
+                        ),
+                        onTap: () {
+                          _launchURL('http://docs.google.com/viewer?url=$url');
+                        },
                       ),
-                    ),
-                    onTap: () {
-                      _launchURL('http://docs.google.com/viewer?url=$url');
-                    },
-                  )
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          color: category == 'Sports'
+                              ? Colors.orange
+                              : category == 'Technical'
+                                  ? Colors.pinkAccent
+                                  : Colors.cyan,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 6.0, horizontal: 8.0),
+                          child: Text(
+                            category,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ],
               ),
             ),
