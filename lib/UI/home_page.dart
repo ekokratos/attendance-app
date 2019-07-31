@@ -456,7 +456,6 @@ class _HomePageState extends State<HomePage> {
   Future<String> filePath;
   int year;
   String branch;
-
   double pagePosition = 0.0;
   double scrollPosition = 0.0;
 
@@ -532,7 +531,8 @@ class _HomePageState extends State<HomePage> {
                                               titleController.value.text)
                                           .setData({
                                         'title': titleController.value.text,
-                                        'url': url
+                                        'url': url,
+                                        'usn': []
                                       });
                                       titleController.clear();
                                       Navigator.pop(context);
