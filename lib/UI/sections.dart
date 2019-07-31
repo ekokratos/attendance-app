@@ -36,6 +36,10 @@ class LetterDetail {
   final String imageUrl;
 }
 
+class NotificationCardDetail {
+  const NotificationCardDetail();
+}
+
 class Section {
   const Section({
     this.title,
@@ -99,6 +103,8 @@ const LetterDetail letterDetail1 = LetterDetail(
     imageUrl:
         'https://firebasestorage.googleapis.com/v0/b/cloud-messaging-b6180.appspot.com/o/Melwin%2Fcheck_1.pdf?alt=media&token=ffe65276-82ce-4ca6-a6b9-c030fb4dd3be');
 
+const NotificationCardDetail notificationCardDetail1 = NotificationCardDetail();
+
 final List<Section> allSections = <Section>[
   const Section(
     title: 'ATTENDANCE',
@@ -119,9 +125,9 @@ final List<Section> allSections = <Section>[
     details: <LetterDetail>[letterDetail1],
   ),
   const Section(
-    title: 'FACULTY',
+    title: 'NOTIFICATIONS',
     leftColor: Colors.white,
     rightColor: Color(0xFFF95B57),
-    details: <AttendanceDetail>[],
+    details: <NotificationCardDetail>[notificationCardDetail1],
   ),
 ];

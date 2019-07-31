@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class Broadcast extends StatefulWidget {
   @override
@@ -13,11 +14,12 @@ class _BroadcastState extends State<Broadcast> {
   String selectedYear;
   String selectedSection;
   String selectedDept;
-  String _title;
-  String _message;
 
   @override
   Widget build(BuildContext context) {
+    final HttpsCallable callable = CloudFunctions.instance
+        .getHttpsCallable(functionName: 'sendMessage')
+          ..timeout = const Duration(seconds: 30);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -223,13 +225,33 @@ class _BroadcastState extends State<Broadcast> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                         color: Colors.lightBlueAccent,
-                        onPressed: () {
+                        onPressed: () async {
                           if (selectedDept != null &&
                               selectedYear != null &&
                               selectedSection != null &&
                               messageController.text.isNotEmpty &&
                               titleController.text.isNotEmpty) {
-                            print('Ta-da!');
+                            try {
+                              final HttpsCallableResult result =
+                                  await callable.call(
+                                <String, dynamic>{
+                                  "title": titleController.text,
+                                  "messageBody": messageController.text,
+                                  "class": selectedYear +
+                                      selectedSection +
+                                      selectedDept,
+                                },
+                              );
+                              print(result.data);
+                            } on CloudFunctionsException catch (e) {
+                              print('caught firebase functions exception');
+                              print(e.code);
+                              print(e.message);
+                              print(e.details);
+                            } catch (e) {
+                              print('caught generic exception');
+                              print(e);
+                            }
                           } else
                             Scaffold.of(_snackbarKey.currentContext)
                                 .showSnackBar(

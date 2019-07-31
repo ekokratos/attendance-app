@@ -5,6 +5,7 @@ import 'sections.dart';
 import 'widgets.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 
@@ -453,6 +454,7 @@ class _HomePageState extends State<HomePage> {
   ValueNotifier<double> selectedIndex = ValueNotifier<double>(0.0);
   final Section section = Section();
   final _firestore = Firestore.instance;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   Future<String> filePath;
   int year;
   String branch;
@@ -460,6 +462,14 @@ class _HomePageState extends State<HomePage> {
   double scrollPosition = 0.0;
 
   final titleController = TextEditingController();
+
+  List<NotificationCard> notifications = new List<NotificationCard>();
+
+  @override
+  void initState() {
+    super.initState();
+    _firebaseMessaging.subscribeToTopic("4BCSE");
+  }
 
   @override
   void dispose() {
@@ -619,6 +629,10 @@ class _HomePageState extends State<HomePage> {
             branch: branch,
             year: year.toString(),
             section: widget.section);
+      if (detail is NotificationCardDetail)
+        return NotificationSectionDetailView(
+          firebaseMessaging: _firebaseMessaging,
+        );
       return null;
     });
     return ListTile.divideTiles(context: context, tiles: detailItems);

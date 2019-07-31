@@ -4,6 +4,7 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 const double kSectionIndicatorWidth = 32.0;
 
@@ -761,3 +762,110 @@ _launchURL(String url) async {
 }
 
 // -----------------------------------------------------------------------------
+class NotificationSectionDetailView extends StatefulWidget {
+  final FirebaseMessaging firebaseMessaging;
+  NotificationSectionDetailView({this.firebaseMessaging});
+  @override
+  _NotificationSectionDetailViewState createState() =>
+      _NotificationSectionDetailViewState();
+}
+
+class _NotificationSectionDetailViewState
+    extends State<NotificationSectionDetailView> {
+  List<NotificationCard> notifications = new List<NotificationCard>();
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.firebaseMessaging.subscribeToTopic("4BCSE");
+
+    widget.firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+        setState(() {
+          notifications.add(NotificationCard(
+            title: message['data']['title'],
+            lecturerName: "Lecturer Name",
+            messageBody: message['data']['body'],
+          ));
+        });
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+        setState(() {
+          notifications.add(NotificationCard(
+            title: message['data']['title'],
+            lecturerName: "Lecturer Name",
+            messageBody: message['data']['body'],
+          ));
+        });
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+        setState(() {
+          notifications.add(NotificationCard(
+            title: message['data']['title'],
+            lecturerName: "Lecturer Name",
+            messageBody: message['data']['body'],
+          ));
+        });
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height - 110,
+      padding: EdgeInsets.all(10.0),
+      child: ListView.builder(
+        itemCount: notifications.length,
+        itemBuilder: (context, int index) {
+          notifications[index].deleteFunction = () {
+            setState(() {
+              notifications.removeAt(index);
+            });
+          };
+          return notifications[index];
+        },
+      ),
+    );
+  }
+}
+
+class NotificationCard extends StatelessWidget {
+  final String title;
+  final String messageBody;
+  final String lecturerName;
+  Function deleteFunction;
+  NotificationCard({this.title, this.messageBody, this.lecturerName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 5.0,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              children: <Widget>[
+                Text("$title - $lecturerName",
+                    style:
+                        TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
+                SizedBox(height: 10.0),
+                Text(messageBody)
+              ],
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.cancel),
+            onPressed: deleteFunction,
+          )
+        ],
+      ),
+    );
+  }
+}
