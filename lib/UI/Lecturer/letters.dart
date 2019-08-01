@@ -12,6 +12,7 @@ class _LettersState extends State<Letters> {
   String selectedYear;
   String selectedSection;
   String selectedDept;
+  String selectedCategory;
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +96,7 @@ class _LettersState extends State<Letters> {
                             fontSize: 20, fontWeight: FontWeight.w600),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 32.0),
+                        padding: const EdgeInsets.symmetric(vertical: 24.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
@@ -136,6 +137,23 @@ class _LettersState extends State<Letters> {
                               selectedDept = newValue;
                             });
                           }),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 24.0),
+                        child: DropDownButton(
+                            hintText: 'Category',
+                            updatedValue: selectedCategory,
+                            dropdownValues: [
+                              'All',
+                              'Technical',
+                              'Cultural',
+                              'Sports'
+                            ],
+                            onChanged: (String newValue) {
+                              setState(() {
+                                selectedCategory = newValue;
+                              });
+                            }),
+                      )
                     ],
                   ),
                 ),
@@ -176,6 +194,7 @@ class _LettersState extends State<Letters> {
                                     year: selectedYear,
                                     department: selectedDept,
                                     section: selectedSection,
+                                    category: selectedCategory,
                                   )),
                         );
                       else {

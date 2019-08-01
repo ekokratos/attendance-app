@@ -20,10 +20,11 @@ List<String> months = [
 ];
 
 class StudentList extends StatelessWidget {
-  StudentList({this.year, this.section, this.department});
+  StudentList({this.year, this.section, this.department, this.category});
   final String year;
   final String section;
   final String department;
+  final String category;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -68,13 +69,37 @@ class StudentList extends StatelessWidget {
             List<Padding> cardWidgets = [];
 
             List<String> usnList = [];
-            for (var message in messages) {
-              if (!usnList.contains(message.documentID.substring(0, 10))) {
-                usnList.add(message.documentID.substring(0, 10));
+            if (category == 'All' || category == null) {
+              for (var message in messages) {
+                if (!usnList.contains(message.documentID.substring(0, 10))) {
+                  usnList.add(message.documentID.substring(0, 10));
 
-                final card =
-                    letterCard(context: context, id: message.documentID);
-                cardWidgets.add(card);
+                  final card =
+                      letterCard(context: context, id: message.documentID);
+                  cardWidgets.add(card);
+                }
+              }
+            } else {
+              cardWidgets.add(Padding(
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                child: Text(
+                  category,
+                  style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+              ));
+              for (var message in messages) {
+                if (!usnList.contains(message.documentID.substring(0, 10))) {
+                  if (message.data['category'] == category) {
+                    usnList.add(message.documentID.substring(0, 10));
+
+                    final card =
+                        letterCard(context: context, id: message.documentID);
+                    cardWidgets.add(card);
+                  }
+                }
               }
             }
             return Container(
@@ -122,6 +147,7 @@ class StudentList extends StatelessWidget {
                             department: department,
                             section: section,
                             usn: text.data,
+                            category: category,
                           ),
                         ),
                       );
@@ -138,11 +164,13 @@ class StudentList extends StatelessWidget {
 }
 
 class LetterList extends StatelessWidget {
-  LetterList({this.year, this.section, this.department, this.usn});
+  LetterList(
+      {this.year, this.section, this.department, this.usn, this.category});
   final String year;
   final String section;
   final String department;
   final String usn;
+  final String category;
 
   @override
   Widget build(BuildContext context) {
@@ -186,24 +214,49 @@ class LetterList extends StatelessWidget {
             final messages = snapshot.data.documents.reversed;
 
             List<Padding> cardWidgets = [];
-            for (var message in messages) {
-              if (message.documentID.substring(0, 10) == usn) {
-                final title = message.data['title'];
-                final url = message.data['url'];
-                final category = message.data['category'];
-                final fromDate = message.data['from'];
-                final toDate = message.data['to'];
+            if (category == 'All' || category == null) {
+              for (var message in messages) {
+                if (message.documentID.substring(0, 10) == usn) {
+                  final title = message.data['title'];
+                  final url = message.data['url'];
+                  final category = message.data['category'];
+                  final fromDate = message.data['from'];
+                  final toDate = message.data['to'];
 
-                final card = letterCard(
-                    context: context,
-                    title: title,
-                    url: url,
-                    from: fromDate,
-                    to: toDate,
-                    category: category,
-                    instance: _firestore,
-                    id: message.documentID);
-                cardWidgets.add(card);
+                  final card = letterCard(
+                      context: context,
+                      title: title,
+                      url: url,
+                      from: fromDate,
+                      to: toDate,
+                      category: category,
+                      instance: _firestore,
+                      id: message.documentID);
+                  cardWidgets.add(card);
+                }
+              }
+            } else {
+              for (var message in messages) {
+                if (message.documentID.substring(0, 10) == usn) {
+                  if (message.data['category'] == category) {
+                    final title = message.data['title'];
+                    final url = message.data['url'];
+                    final category = message.data['category'];
+                    final fromDate = message.data['from'];
+                    final toDate = message.data['to'];
+
+                    final card = letterCard(
+                        context: context,
+                        title: title,
+                        url: url,
+                        from: fromDate,
+                        to: toDate,
+                        category: category,
+                        instance: _firestore,
+                        id: message.documentID);
+                    cardWidgets.add(card);
+                  }
+                }
               }
             }
             return Container(
@@ -273,11 +326,17 @@ class LetterList extends StatelessWidget {
                                 fontSize: 16, color: Color(0xDF004D99)),
                           ),
                           Text(
-                            ' to ',
+                            from.contains(to) ? '' : ' to ',
                             style: TextStyle(fontSize: 16),
                           ),
                           Text(
-                            toDate + '-' + months[toMonth - 1] + ' \'' + year,
+                            from.contains(to)
+                                ? ''
+                                : toDate +
+                                    '-' +
+                                    months[toMonth - 1] +
+                                    ' \'' +
+                                    year,
                             style: TextStyle(
                                 fontSize: 16, color: Color(0xDF004D99)),
                           )

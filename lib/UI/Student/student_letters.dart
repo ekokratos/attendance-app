@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'letter_details.dart';
@@ -168,12 +167,22 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
                     Row(
                       children: <Widget>[
                         IconButton(
-                          icon: Icon(Icons.open_in_new),
+                          icon: Icon(Icons.edit),
 
                           /// Launch the url using the Google Docs
                           onPressed: () {
-                            _launchURL(
-                                'http://docs.google.com/viewer?url=$url');
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => LetterDetails(
+                                          firestore: widget.firestore,
+                                          branch: widget.branch,
+                                          year: widget.year,
+                                          section: widget.section,
+                                          usn: widget.usn,
+                                          cardTitle: text.data,
+                                          isEditing: true,
+                                        )));
                           },
                         ),
 
@@ -481,15 +490,6 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
         ),
       ),
     );
-  }
-}
-
-/// Launch the url using the url_launcher package
-_launchURL(String url) async {
-  if (await canLaunch(url)) {
-    await launch(url);
-  } else {
-    throw 'Could not launch $url';
   }
 }
 
