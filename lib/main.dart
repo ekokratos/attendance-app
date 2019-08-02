@@ -8,7 +8,6 @@ import 'UI/Lecturer/letters.dart';
 import 'UI/Lecturer/letter_list.dart';
 import 'UI/Lecturer/broadcast.dart';
 import 'UI/Student/student_letters.dart';
-import 'UI/Student/student_letters.dart';
 
 void main() => runApp(MyApp());
 

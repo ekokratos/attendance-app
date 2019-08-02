@@ -340,6 +340,7 @@ class _LetterDetailsState extends State<LetterDetails> {
                                                 .child(widget.usn +
                                                     '-' +
                                                     widget.cardTitle);
+                                        storageRef.delete();
                                         final StorageUploadTask uploadTask =
                                             storageRef
                                                 .putFile(File(await filePath));
@@ -407,7 +408,7 @@ class _LetterDetailsState extends State<LetterDetails> {
                                           'url': fileName.isEmpty
                                               ? retrievedUrl
                                               : url,
-                                          'usn': []
+                                          'usn': FieldValue.arrayUnion([])
                                         });
                                       }
 
