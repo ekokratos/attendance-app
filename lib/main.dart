@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/letters',
+      initialRoute: '/studentLetters',
       routes: {
         '/': (context) => WelcomePage(),
         '/studentLogin': (context) => StudentLogin(),
@@ -26,7 +26,8 @@ class MyApp extends StatelessWidget {
         '/letters': (context) => Letters(),
         '/letters_list': (context) => LetterList(),
         '/broadcast': (context) => Broadcast(),
-        '/studentLetters': (context) => LetterSectionDetailView()
+        '/studentLetters': (context) => LetterSectionDetailView(),
+        '/studentLetter': (context) => LetterSectionDetailView()
       },
     );
   }

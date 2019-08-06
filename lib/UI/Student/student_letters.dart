@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'letter_details.dart';
@@ -24,12 +23,9 @@ class LetterSectionDetailView extends StatefulWidget {
 
 class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
   /// --------------------------------------------------------------------------
-  List<List<Row>> textFields = [[]]; // TODO: Shreyas fix these
-  List<List<TextEditingController>> textFieldController = [[]];
-  List innerIndex = [];
-
-  /// --------------------------------------------------------------------------
   List<bool> isUsnListVisible = [false];
+  List<bool> isVisible = [false];
+  List<TextEditingController> controller = [TextEditingController()];
 
   // ---------------------------------------------------------------------------
   /// StreamBuilder used to build the cards
@@ -98,9 +94,10 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
                 final toDate = message.data['to'];
                 final category = message.data['category'];
                 final outcome = message.data['outcome'];
+                final usnList = message.data['usn'];
 
                 final card = buildCard(
-                    outIndex: i,
+                    index: i,
                     context: context,
                     title: title,
                     url: url,
@@ -108,13 +105,13 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
                     to: toDate,
                     category: category,
                     outcome: outcome,
+                    usnList: usnList,
                     instance: widget.firestore,
                     documentId: message.documentID);
                 cardWidgets.add(card);
-                textFields.add([]); // TODO
-                textFieldController.add([]);
+                isVisible.add(false);
                 isUsnListVisible.add(false);
-                innerIndex.add(0);
+                controller.add(TextEditingController());
                 i = i + 1;
               }
             }
@@ -135,7 +132,7 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
   // ---------------------------------------------------------------------------
   /// Building the body of the card
   Padding buildCard(
-      {int outIndex,
+      {int index,
       BuildContext context,
       String title,
       String url,
@@ -143,6 +140,7 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
       String documentId,
       String from,
       String to,
+      List usnList,
       String category,
       String outcome}) {
     /// Storing title in [text] to use later
@@ -168,12 +166,22 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
                     Row(
                       children: <Widget>[
                         IconButton(
-                          icon: Icon(Icons.open_in_new),
+                          icon: Icon(Icons.edit),
 
                           /// Launch the url using the Google Docs
                           onPressed: () {
-                            _launchURL(
-                                'http://docs.google.com/viewer?url=$url');
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => LetterDetails(
+                                          firestore: widget.firestore,
+                                          branch: widget.branch,
+                                          year: widget.year,
+                                          section: widget.section,
+                                          usn: widget.usn,
+                                          cardTitle: text.data,
+                                          isEditing: true,
+                                        )));
                           },
                         ),
 
@@ -205,13 +213,13 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
                         IconButton(
                           icon: Icon(Icons.keyboard_arrow_down),
                           onPressed: () {
-                            if (isUsnListVisible[outIndex]) {
+                            if (isUsnListVisible[index]) {
                               setState(() {
-                                isUsnListVisible[outIndex] = false;
+                                isUsnListVisible[index] = false;
                               });
                             } else {
                               setState(() {
-                                isUsnListVisible[outIndex] = true;
+                                isUsnListVisible[index] = true;
                               });
                             }
                           },
@@ -225,7 +233,7 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
 
                 /// StreamBuilder used to build the USN list inside the card
                 Visibility(
-                  visible: isUsnListVisible[outIndex],
+                  visible: isUsnListVisible[index],
                   child: StreamBuilder<QuerySnapshot>(
                     stream: widget.firestore
                         .collection(widget.branch +
@@ -295,6 +303,23 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
                                       final String branch =
                                           usnText.data.substring(5, 7);
 
+                                      for (var usn in usnList) {
+                                        instance
+                                            .collection(widget.branch +
+                                                '-' +
+                                                widget.year +
+                                                '-' +
+                                                widget.section)
+                                            .document(usn + '-' + text.data)
+                                            .updateData({
+                                          'title': text.data,
+                                          'url': url,
+                                          // Update the [usnList] by removing the USN
+                                          'usn': FieldValue.arrayRemove(
+                                              [usnText.data])
+                                        });
+                                      }
+
                                       /// This is to update the [usnList] of the student.
                                       instance
                                           .collection(widget.branch +
@@ -345,15 +370,30 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
 
                 /// ListView to display the text fields to enter the USN
                 // TODO: Needs to be fixed
-                ListView.builder(
-                    physics: ClampingScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemCount: textFields[outIndex].length,
-                    itemBuilder: (context, int index) {
-                      innerIndex[outIndex] = index + 1;
-                      return textFields[outIndex][index];
-                    }),
+                Visibility(
+                  visible: isVisible[index],
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextFormField(
+                          controller: controller[index],
+                          decoration: InputDecoration(
+                            hintText: 'Enter the USN',
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.cancel),
+                        onPressed: () {
+                          setState(() {
+                            controller[index].clear();
+                            isVisible[index] = false;
+                          });
+                        },
+                      )
+                    ],
+                  ),
+                ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 24.0),
                   child: Row(
@@ -366,110 +406,111 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
                         ),
                         onTap: () {
                           setState(() {
-                            textFieldController[outIndex]
-                                .add(TextEditingController());
-                            textFields[outIndex].add(
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller: textFieldController[outIndex]
-                                          [innerIndex[outIndex]],
-                                      decoration: InputDecoration(
-                                        labelText: 'USN',
-                                        focusedBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: Colors.orange)),
-                                      ),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.cancel),
-                                    onPressed: () {
-                                      setState(() {
-                                        textFields[outIndex].removeLast();
-                                      });
-                                    },
-                                  )
-                                ],
-                              ),
-                            );
+                            isVisible[index] = true;
                           });
                         },
                       ),
                       RaisedButton(
                         color: Colors.orange,
                         child: Text('Submit'),
-                        onPressed: () {
-                          List<String> usnList = [];
-                          for (List controllerList in textFieldController)
-                            for (TextEditingController controller
-                                in controllerList) {
-                              //TODO: Careful while changing the controllers
+                        onPressed: () async {
+                          /// Regex to match the USN entered
+                          RegExp regex =
+                              RegExp('^[0-9]SF[0-9]{2}[A-Z]{2}[0-9]{3}\$');
 
-                              /// Regex to match the USN entered
-                              RegExp regex =
-                                  RegExp('^[0-9]SF[0-9]{2}[A-Z]{2}[0-9]{3}\$');
+                          /// If there's no match a Snackbar will be displayed
+                          /// When the user enters the USN we have to update the [usnList]
+                          /// and we have to add the particular letter.
 
-                              /// If there's no match a Snackbar will be displayed
-                              /// When the user enters the USN we have to update the [usnList]
-                              /// and we have to add the particular letter.
-                              if (regex.hasMatch(controller.value.text)) {
-                                usnList.add(controller.value.text);
+                          /// To get the collection details for the new USN
+                          /// Following calculated to get the year and branch of the
+                          /// entered USN
+                          final int year = DateTime.now().year -
+                              int.parse('20' +
+                                  controller[index].value.text.substring(3, 5));
+                          final String branch =
+                              controller[index].value.text.substring(5, 7);
 
-                                /// To get the collection details for the new USN
-                                /// Following calculated to get the year and branch of the
-                                /// entered USN
-                                final int year = DateTime.now().year -
-                                    int.parse('20' +
-                                        controller.value.text.substring(3, 5));
-                                final String branch =
-                                    controller.value.text.substring(5, 7);
+                          /// To add the letter to the new USN
+                          instance
+                              .collection(branch +
+                                  '-' +
+                                  year.toString() +
+                                  '-' +
+                                  widget.section)
+                              .document(controller[index].value.text +
+                                  '-' +
+                                  text.data)
+                              .setData({
+                            'title': text.data,
+                            'url': url,
+                            'from': from,
+                            'to': to,
+                            'category': category,
+                            'outcome': outcome,
+                            'usn': FieldValue.arrayUnion([widget.usn])
+                          });
 
-                                /// To add the letter to the new USN
-                                instance
-                                    .collection(branch +
-                                        '-' +
-                                        year.toString() +
-                                        '-' +
-                                        widget.section)
-                                    .document(
-                                        controller.value.text + '-' + text.data)
-                                    .setData({
-                                  'title': text.data,
-                                  'url': url,
-                                  'from': from,
-                                  'to': to,
-                                  'category': category,
-                                  'outcome': outcome,
-                                  'usn': []
-                                });
+                          final DocumentSnapshot message = await widget
+                              .firestore
+                              .collection(
+                                  '${widget.branch}-${widget.year}-${widget.section}')
+                              .document('${widget.usn}-${text.data}')
+                              .get();
 
-                                /// To update the [usnList] of the student
-                                instance
-                                    .collection(widget.branch +
-                                        '-' +
-                                        widget.year +
-                                        '-' +
-                                        widget.section)
-                                    .document(widget.usn + '-' + text.data)
-                                    .updateData({
-                                  'usn': FieldValue.arrayUnion(usnList)
-                                });
-
-                                //TODO: Currently done as there multiple controllers
-                                setState(() {
-                                  controller.clear();
-                                  textFields.clear();
-                                  textFields.add([]);
-                                  usnList.clear();
-                                });
-                              } else {
-                                final snackBar = SnackBar(
-                                    content: Text('Please enter valid USN'));
-                                Scaffold.of(context).showSnackBar(snackBar);
-                              }
+                          final List retrievedUsnList = message['usn'];
+                          final updatedList = [controller[index].value.text];
+                          for (var outerUsn in retrievedUsnList) {
+                            final updatedList = [controller[index].value.text];
+                            for (var usn in retrievedUsnList) {
+                              updatedList.add(usn);
                             }
+                            updatedList.remove(outerUsn);
+                            instance
+                                .collection(branch +
+                                    '-' +
+                                    year.toString() +
+                                    '-' +
+                                    widget.section)
+                                .document(outerUsn + '-' + text.data)
+                                .updateData({
+                              'usn': FieldValue.arrayUnion(updatedList)
+                            });
+                            updatedList.clear();
+                          }
+
+                          for (var usn in retrievedUsnList) {
+                            updatedList.add(usn);
+                          }
+                          updatedList.remove(controller[index].value.text);
+                          instance
+                              .collection(branch +
+                                  '-' +
+                                  year.toString() +
+                                  '-' +
+                                  widget.section)
+                              .document(controller[index].value.text +
+                                  '-' +
+                                  text.data)
+                              .updateData(
+                                  {'usn': FieldValue.arrayUnion(updatedList)});
+
+                          /// To update the [usnList] of the student
+                          instance
+                              .collection(widget.branch +
+                                  '-' +
+                                  widget.year +
+                                  '-' +
+                                  widget.section)
+                              .document(widget.usn + '-' + text.data)
+                              .updateData({
+                            'usn': FieldValue.arrayUnion(
+                                [controller[index].value.text])
+                          });
+                          setState(() {
+                            controller[index].clear();
+                            isVisible[index] = false;
+                          });
                         },
                       )
                     ],
@@ -481,15 +522,6 @@ class _LetterSectionDetailViewState extends State<LetterSectionDetailView> {
         ),
       ),
     );
-  }
-}
-
-/// Launch the url using the url_launcher package
-_launchURL(String url) async {
-  if (await canLaunch(url)) {
-    await launch(url);
-  } else {
-    throw 'Could not launch $url';
   }
 }
 
