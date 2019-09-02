@@ -7,7 +7,9 @@ import 'UI/Lecturer/lecturer_homepage.dart';
 import 'UI/Lecturer/letters.dart';
 import 'UI/Lecturer/letter_list.dart';
 import 'UI/Lecturer/broadcast.dart';
+import 'UI/Lecturer/report.dart';
 import 'UI/Student/student_letters.dart';
+import 'UI/timetable.dart';
 
 void main() => runApp(MyApp());
 
@@ -16,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/studentLetters',
+      initialRoute: '/report',
       routes: {
         '/': (context) => WelcomePage(),
         '/studentLogin': (context) => StudentLogin(),
@@ -26,8 +28,9 @@ class MyApp extends StatelessWidget {
         '/letters': (context) => Letters(),
         '/letters_list': (context) => LetterList(),
         '/broadcast': (context) => Broadcast(),
-        '/studentLetters': (context) => LetterSectionDetailView(),
-        '/studentLetter': (context) => LetterSectionDetailView()
+        '/studentLetters': (context) => StudentLetterPage(),
+        '/report': (context) => Report(),
+        '/timetable': (context) => Timetable()
       },
     );
   }

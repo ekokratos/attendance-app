@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:attendance_app/UI/date_time_picker.dart';
+import 'package:flare_flutter/flare_actor.dart';
 
 class LetterDetails extends StatefulWidget {
   Firestore firestore;
@@ -461,6 +462,10 @@ class _LetterDetailsState extends State<LetterDetails> {
                                             : url,
                                         'usn': retrievedUsnList
                                       });
+                                      if (fileName.isEmpty) {
+                                        sleep(Duration(seconds: 1));
+                                      }
+                                      Navigator.pop(context);
                                     }
                                   : () async {
                                       if (_formKey.currentState.validate()) {
@@ -532,7 +537,7 @@ class _LetterDetailsState extends State<LetterDetails> {
                                       }
                                     },
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),

@@ -39,10 +39,14 @@ class StudentHome extends StatelessWidget {
           actions: <Widget>[
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
-              child: Icon(
-                Icons.calendar_today,
-                size: 32,
-              ),
+              child: IconButton(
+                  icon: Icon(
+                    Icons.calendar_today,
+                    size: 32,
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/table');
+                  }),
             )
           ],
         ),
@@ -60,7 +64,7 @@ class StudentHome extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => StudentAttendance()));
+                              builder: (context) => StudentAttendancePage()));
                     }),
                 buildCard(
                     beginColor: Color(0xFF45C7FF),
@@ -70,7 +74,7 @@ class StudentHome extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => StudentMarks()));
+                              builder: (context) => StudentMarksPage()));
                     }),
               ],
             ),
@@ -85,7 +89,7 @@ class StudentHome extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => LetterSectionDetailView(
+                            builder: (context) => StudentLetterPage(
                                 firestore: _firestore,
                                 usn: usn,
                                 branch: branch,
@@ -101,8 +105,7 @@ class StudentHome extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  NotificationSectionDetailView(
+                              builder: (context) => StudentNotificationPage(
                                     firebaseMessaging: _firebaseMessaging,
                                   )));
                     }),

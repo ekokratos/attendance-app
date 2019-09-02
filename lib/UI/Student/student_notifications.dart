@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-class NotificationSectionDetailView extends StatefulWidget {
+class StudentNotificationPage extends StatefulWidget {
   final FirebaseMessaging firebaseMessaging;
-  NotificationSectionDetailView({this.firebaseMessaging});
+  StudentNotificationPage({this.firebaseMessaging});
   @override
-  _NotificationSectionDetailViewState createState() =>
-      _NotificationSectionDetailViewState();
+  _StudentNotificationPageState createState() =>
+      _StudentNotificationPageState();
 }
 
-class _NotificationSectionDetailViewState
-    extends State<NotificationSectionDetailView> {
+class _StudentNotificationPageState extends State<StudentNotificationPage> {
   List<NotificationCard> notifications = new List<NotificationCard>();
 
   @override

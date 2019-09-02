@@ -14,7 +14,7 @@ description: A new Flutter application.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -34,15 +34,20 @@ dependencies:
 
   cloud_firestore: ^0.12.8+1
 
-  sliver_fill_remaining_box_adapter: ^0.1.1
-
   cloud_functions: ^0.4.1
 
   firebase_messaging:
 
   intl: 0.15.8
 
+  flare_flutter: ^1.5.5
+
+  json_serializable: ^3.2.2
+
 dev_dependencies:
+
+  build_runner:
+
   flutter_test:
     sdk: flutter
 

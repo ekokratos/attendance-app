@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class StudentAttendance extends StatelessWidget {
+class StudentAttendancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
