@@ -1,37 +1,26 @@
+import 'package:attendance_app/utils/attendence.dart';
 import 'package:flutter/material.dart';
-import 'UI/welcome_page.dart';
-import 'UI/Student/student_login.dart';
-import 'UI/Student/student_homepage.dart';
-import 'UI/Lecturer/lecturer_login.dart';
-import 'UI/Lecturer/lecturer_homepage.dart';
-import 'UI/Lecturer/letters.dart';
-import 'UI/Lecturer/letter_list.dart';
-import 'UI/Lecturer/broadcast.dart';
-import 'UI/Lecturer/report.dart';
-import 'UI/Student/student_letters.dart';
-import 'UI/timetable.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() => runApp(MyApp());
+import 'config/config_page.dart';
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: '/report',
-      routes: {
-        '/': (context) => WelcomePage(),
-        '/studentLogin': (context) => StudentLogin(),
-        '/lecturerLogin': (context) => LecturerLogin(),
-        '/studentHome': (context) => StudentHome(),
-        '/lecturerHome': (context) => LecturerHome(),
-        '/letters': (context) => Letters(),
-        '/letters_list': (context) => LetterList(),
-        '/broadcast': (context) => Broadcast(),
-        '/studentLetters': (context) => StudentLetterPage(),
-        '/report': (context) => Report(),
-        '/timetable': (context) => Timetable()
-      },
-    );
-  }
+Future<void> main() async {
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+    ),
+  );
+
+  //* Forcing only portrait orientation
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
+  // * Get Shared Preference Instance for whole app
+  Attendance.prefs = await SharedPreferences.getInstance();
+
+  //* To check the app is running in debug and set some variables for that
+  Attendance.checkDebug();
+
+  runApp(ConfigPage());
 }

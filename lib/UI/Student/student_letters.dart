@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'letter_details.dart';
+import 'package:attendance_app/firebase/db.dart';
+//import 'package:attendance_app/model/letters.dart';
 
 // -----------------------------------------------------------------------------
 class StudentLetterPage extends StatefulWidget {
