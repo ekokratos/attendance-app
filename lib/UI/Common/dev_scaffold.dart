@@ -41,7 +41,7 @@ class DevScaffold extends StatelessWidget {
                             filename: 'assets/animations/day-night.flr',
                             startingAnimation: 'night_idle')
                         : SmartFlareActor(
-                            filename: 'assets/day-night.flr',
+                            filename: 'assets/animations/day-night.flr',
                             startingAnimation: 'day_idle'),
                   ),
                 ),
