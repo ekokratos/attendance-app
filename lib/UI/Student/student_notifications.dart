@@ -1,3 +1,4 @@
+import 'package:attendance_app/UI/Common/dev_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -55,34 +56,37 @@ class _StudentNotificationPageState extends State<StudentNotificationPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        backgroundColor: Color(0xFF24323F),
-        appBar: AppBar(
-          backgroundColor: Color(0xFF24323F),
-          title: Text('NOTIFICATIONS'),
-          leading: IconButton(
-              icon: Icon(
-                Icons.clear,
-                size: 32,
+      child: DevScaffold(
+        title: 'NOTIFICATIONS',
+        leading: IconButton(
+            icon: Icon(
+              Icons.clear,
+              size: 32,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            }),
+        body: Hero(
+          tag: 'notifications',
+          child: Scaffold(
+            backgroundColor: Color(0xFF24323F),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 16.0),
+                child: ListView.builder(
+                  itemCount: notifications.length,
+                  itemBuilder: (context, int index) {
+                    notifications[index].deleteFunction = () {
+                      setState(() {
+                        notifications.removeAt(index);
+                      });
+                    };
+                    return notifications[index];
+                  },
+                ),
               ),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 16.0),
-            child: ListView.builder(
-              itemCount: notifications.length,
-              itemBuilder: (context, int index) {
-                notifications[index].deleteFunction = () {
-                  setState(() {
-                    notifications.removeAt(index);
-                  });
-                };
-                return notifications[index];
-              },
             ),
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:attendance_app/UI/Common/dev_scaffold.dart';
-import 'package:attendance_app/config/index.dart';
+import 'package:attendance_app/bloc/config/config_bloc.dart';
+import 'package:attendance_app/utils/custom_navigation.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -40,6 +41,14 @@ class _StudentHomeState extends State<StudentHome> {
     _firebaseMessaging.subscribeToTopic("4BCSE");
     return SafeArea(
       child: DevScaffold(
+        leading: IconButton(
+            icon: Icon(Icons.exit_to_app),
+            iconSize: 36,
+            color: Colors.white,
+            onPressed: () {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/', (Route<dynamic> route) => false);
+            }),
         body: Scaffold(
           backgroundColor:
               ConfigBloc().darkModeOn ? Colors.black : Color(0xFF24323F),
@@ -57,6 +66,7 @@ class _StudentHomeState extends State<StudentHome> {
                               beginColor: Color(0xFFFE7649),
                               endColor: Color(0xFFF4336E),
                               text: 'ATTENDANCE',
+                              tag: 'attendance',
                               onTap: () {
                                 Navigator.push(
                                     context,
@@ -67,13 +77,14 @@ class _StudentHomeState extends State<StudentHome> {
                         ),
                         if (onFABPressed)
                           SizedBox(
-                            width: 20,
+                            width: 10,
                           ),
                         Expanded(
                           child: buildCard(
                               beginColor: Color(0xFF45C7FF),
                               endColor: Color(0xFF1250F4),
                               text: 'MARKS',
+                              tag: 'marks',
                               onTap: () {
                                 Navigator.push(
                                     context,
@@ -87,7 +98,7 @@ class _StudentHomeState extends State<StudentHome> {
                   ),
                   if (onFABPressed)
                     SizedBox(
-                      height: 20,
+                      height: 10,
                     ),
                   Expanded(
                     child: Row(
@@ -98,6 +109,7 @@ class _StudentHomeState extends State<StudentHome> {
                               beginColor: Color(0xFF45C7FF),
                               endColor: Color(0xFF1250F4),
                               text: 'LETTERS',
+                              tag: 'letters',
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -113,13 +125,14 @@ class _StudentHomeState extends State<StudentHome> {
                         ),
                         if (onFABPressed)
                           SizedBox(
-                            width: 20,
+                            width: 10,
                           ),
                         Expanded(
                           child: buildCard(
                               beginColor: Color(0xFFFE7649),
                               endColor: Color(0xFFF4336E),
                               text: 'NOTIFICATIONS',
+                              tag: 'notifications',
                               onTap: () {
                                 Navigator.push(
                                     context,
@@ -138,17 +151,38 @@ class _StudentHomeState extends State<StudentHome> {
               ),
               Align(
                 alignment: Alignment.center,
-                child: FloatingActionButton(
-                  backgroundColor: Colors.black,
-                  child: Icon(Icons.add),
-                  onPressed: () {
+                child: Draggable(
+                  onDragStarted: () {
                     setState(() {
-                      if (onFABPressed)
-                        onFABPressed = false;
-                      else
-                        onFABPressed = true;
+                      onFABPressed = true;
                     });
                   },
+                  feedback: FloatingActionButton(
+                      backgroundColor: Colors.black,
+                      child: Icon(Icons.add),
+                      onPressed: () {}),
+                  childWhenDragging: Container(),
+                  onDragEnd: (position) {
+                    setState(() {
+                      onFABPressed = false;
+                    });
+                    DraggableNavigation(
+                        context: context,
+                        position: position,
+                        firebaseMessaging: _firebaseMessaging);
+                  },
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.black,
+                    child: Icon(Icons.add),
+                    onPressed: () {
+                      setState(() {
+                        if (onFABPressed)
+                          onFABPressed = false;
+                        else
+                          onFABPressed = true;
+                      });
+                    },
+                  ),
                 ),
               )
             ],
@@ -159,30 +193,68 @@ class _StudentHomeState extends State<StudentHome> {
   }
 
   GestureDetector buildCard(
-      {Color beginColor, Color endColor, String text, Function onTap}) {
+      {Color beginColor,
+      Color endColor,
+      String text,
+      Function onTap,
+      String tag}) {
     return GestureDetector(
-      child: Container(
-//        height: 240,
-//        width: 160,
-        decoration: BoxDecoration(
-//          borderRadius: BorderRadius.circular(30),
-          gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                beginColor,
-                endColor,
-              ]),
-        ),
-        child: Center(
-          child: Text(
-            text,
-            style: TextStyle(
-                fontSize: 20, color: Colors.white, fontWeight: FontWeight.w600),
+      child: Hero(
+        tag: tag,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  beginColor,
+                  endColor,
+                ]),
+          ),
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600),
+            ),
           ),
         ),
       ),
       onTap: onTap,
     );
+  }
+}
+
+class DraggableNavigation {
+  final DraggableDetails position;
+  final BuildContext context;
+  final FirebaseMessaging firebaseMessaging;
+  DraggableNavigation({this.position, this.context, this.firebaseMessaging}) {
+    if (position.offset.dx < (MediaQuery.of(context).size.width * 0.5) &&
+        position.offset.dy < (MediaQuery.of(context).size.height * 0.5)) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => StudentAttendancePage()));
+    }
+    if (position.offset.dx > (MediaQuery.of(context).size.width * 0.5) &&
+        position.offset.dy < (MediaQuery.of(context).size.height * 0.5)) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => StudentMarksPage()));
+    }
+    if (position.offset.dx < (MediaQuery.of(context).size.width * 0.5) &&
+        position.offset.dy > (MediaQuery.of(context).size.height * 0.5)) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => StudentLetterPage()));
+    }
+    if (position.offset.dx > (MediaQuery.of(context).size.width * 0.5) &&
+        position.offset.dy > (MediaQuery.of(context).size.height * 0.5)) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => StudentNotificationPage(
+                    firebaseMessaging: firebaseMessaging,
+                  )));
+    }
   }
 }

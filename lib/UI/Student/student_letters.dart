@@ -1,3 +1,4 @@
+import 'package:attendance_app/UI/Common/dev_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,95 +38,106 @@ class _StudentLetterPageState extends State<StudentLetterPage> {
     widget.firestore =
         widget.firestore == null ? Firestore.instance : widget.firestore;
     return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        backgroundColor: Color(0xFF24323F),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LetterDetails(
-                  firestore: widget.firestore,
-                  branch: widget.branch,
-                  year: widget.year,
-                  section: widget.section,
-                  usn: widget.usn,
-                ),
-              ),
-            );
-          },
-          child: Icon(Icons.add),
-        ),
-        appBar: AppBar(
-          backgroundColor: Color(0xFF24323F),
-          leading: IconButton(
-              icon: Icon(
-                Icons.clear,
-                size: 32,
-              ),
+      child: DevScaffold(
+        leading: IconButton(
+            icon: Icon(
+              Icons.clear,
+              size: 32,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            }),
+        title: 'LETTERS',
+        body: Hero(
+          tag: 'letters',
+          child: Scaffold(
+            resizeToAvoidBottomInset: true,
+            backgroundColor: Color(0xFF24323F),
+            floatingActionButton: RaisedButton(
+              shape: CircleBorder(),
+              color: Colors.lightBlueAccent,
               onPressed: () {
-                Navigator.pop(context);
-              }),
-          title: Text('LETTERS'),
-        ),
-        body: StreamBuilder<QuerySnapshot>(
-          stream: widget.firestore
-              .collection(
-                  widget.branch + '-' + widget.year + '-' + widget.section)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.lightBlueAccent,
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LetterDetails(
+                      firestore: widget.firestore,
+                      branch: widget.branch,
+                      year: widget.year,
+                      section: widget.section,
+                      usn: widget.usn,
+                    ),
+                  ),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(14.0),
+                child: Icon(
+                  Icons.add,
+                  color: Colors.white,
                 ),
-              );
-            }
-
-            // Sort the documents from first to last
-            final messages = snapshot.data.documents.reversed;
-
-            List<Padding> cardWidgets = [];
-            int i = 0;
-            for (var message in messages) {
-              if (message.documentID.substring(0, 10) == widget.usn) {
-                final title = message.data['title'];
-                final url = message.data['url'];
-                final fromDate = message.data['from'];
-                final toDate = message.data['to'];
-                final category = message.data['category'];
-                final outcome = message.data['outcome'];
-                final usnList = message.data['usn'];
-
-                final card = buildCard(
-                    index: i,
-                    context: context,
-                    title: title,
-                    url: url,
-                    from: fromDate,
-                    to: toDate,
-                    category: category,
-                    outcome: outcome,
-                    usnList: usnList,
-                    instance: widget.firestore,
-                    documentId: message.documentID);
-                cardWidgets.add(card);
-                isTextFormVisible.add(false);
-                isUsnListVisible.add(false);
-                controller.add(TextEditingController());
-                i = i + 1;
-              }
-            }
-            return Container(
-              height: MediaQuery.of(context).size.height - 110,
-              child: ListView(
-                physics: ClampingScrollPhysics(),
-                shrinkWrap: true,
-                children: cardWidgets,
               ),
-            );
-          },
+            ),
+            body: StreamBuilder<QuerySnapshot>(
+              stream: widget.firestore
+                  .collection(
+                      widget.branch + '-' + widget.year + '-' + widget.section)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.lightBlueAccent,
+                    ),
+                  );
+                }
+
+                // Sort the documents from first to last
+                final messages = snapshot.data.documents.reversed;
+
+                List<Padding> cardWidgets = [];
+                int i = 0;
+                for (var message in messages) {
+                  if (message.documentID.substring(0, 10) == widget.usn) {
+                    final title = message.data['title'];
+                    final url = message.data['url'];
+                    final fromDate = message.data['from'];
+                    final toDate = message.data['to'];
+                    final category = message.data['category'];
+                    final outcome = message.data['outcome'];
+                    final usnList = message.data['usn'];
+
+                    final card = buildCard(
+                        index: i,
+                        context: context,
+                        title: title,
+                        url: url,
+                        from: fromDate,
+                        to: toDate,
+                        category: category,
+                        outcome: outcome,
+                        usnList: usnList,
+                        instance: widget.firestore,
+                        documentId: message.documentID);
+                    cardWidgets.add(card);
+                    isTextFormVisible.add(false);
+                    isUsnListVisible.add(false);
+                    controller.add(TextEditingController());
+                    i = i + 1;
+                  }
+                }
+                return Container(
+                  height: MediaQuery.of(context).size.height - 110,
+                  child: ListView(
+                    physics: ClampingScrollPhysics(),
+                    shrinkWrap: true,
+                    children: cardWidgets,
+                  ),
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

@@ -1,12 +1,14 @@
+import 'package:attendance_app/bloc/config/index.dart';
 import 'package:flutter/material.dart';
-import 'package:attendance_app/config/index.dart';
 import 'package:smart_flare/smart_flare.dart';
 
 class DevScaffold extends StatelessWidget {
   final String title;
   final Widget body;
+  final Widget leading;
 
-  const DevScaffold({Key key, @required this.body, this.title = ""})
+  const DevScaffold(
+      {Key key, @required this.body, this.title = "", this.leading})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -20,15 +22,11 @@ class DevScaffold extends StatelessWidget {
           appBar: AppBar(
             backgroundColor:
                 ConfigBloc().darkModeOn ? Colors.black : Color(0xFF24323F),
-            title: Text(title),
-            leading: IconButton(
-                icon: Icon(Icons.exit_to_app),
-                iconSize: 36,
-                color: Colors.white,
-                onPressed: () {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/', (Route<dynamic> route) => false);
-                }),
+            title: Text(
+              title,
+              style: TextStyle(color: Colors.white),
+            ),
+            leading: leading,
             actions: <Widget>[
               GestureDetector(
                 child: Padding(

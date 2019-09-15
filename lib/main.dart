@@ -2,8 +2,7 @@ import 'package:attendance_app/utils/attendence.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'config/config_page.dart';
+import 'bloc/config/config_page.dart';
 
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
