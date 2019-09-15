@@ -1,5 +1,6 @@
 import 'package:attendance_app/UI/Common/dev_scaffold.dart';
 import 'package:attendance_app/bloc/config/config_bloc.dart';
+import 'package:attendance_app/constants/color_constants.dart';
 import 'package:attendance_app/utils/custom_navigation.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
@@ -158,7 +159,9 @@ class _StudentHomeState extends State<StudentHome> {
                     });
                   },
                   feedback: FloatingActionButton(
-                      backgroundColor: Colors.black,
+                      backgroundColor: ConfigBloc().darkModeOn
+                          ? kFABDarkModeColor
+                          : kFABLightModeColor,
                       child: Icon(Icons.add),
                       onPressed: () {}),
                   childWhenDragging: Container(),
@@ -172,8 +175,15 @@ class _StudentHomeState extends State<StudentHome> {
                         firebaseMessaging: _firebaseMessaging);
                   },
                   child: FloatingActionButton(
-                    backgroundColor: Colors.black,
-                    child: Icon(Icons.add),
+                    backgroundColor: ConfigBloc().darkModeOn
+                        ? kFABDarkModeColor
+                        : kFABLightModeColor,
+                    child: Icon(
+                      Icons.add,
+                      color: ConfigBloc().darkModeOn
+                          ? kIconDarkModeColor
+                          : kIconLightModeColor,
+                    ),
                     onPressed: () {
                       setState(() {
                         if (onFABPressed)
@@ -201,22 +211,25 @@ class _StudentHomeState extends State<StudentHome> {
     return GestureDetector(
       child: Hero(
         tag: tag,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  beginColor,
-                  endColor,
-                ]),
-          ),
+        child: Card(
+          margin: EdgeInsets.all(1),
+          color: ConfigBloc().darkModeOn ? Color(0xFF393E46) : Colors.white,
+//          decoration: BoxDecoration(
+//            gradient: LinearGradient(
+//                begin: Alignment.topLeft,
+//                end: Alignment.bottomRight,
+//                colors: [
+//                  beginColor,
+//                  endColor,
+//                ]),
+//          ),
           child: Center(
             child: Text(
               text,
               style: TextStyle(
                   fontSize: 20,
-                  color: Colors.white,
+                  color:
+                      ConfigBloc().darkModeOn ? Colors.redAccent : Colors.black,
                   fontWeight: FontWeight.w600),
             ),
           ),

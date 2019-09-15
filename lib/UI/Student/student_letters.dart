@@ -1,4 +1,6 @@
 import 'package:attendance_app/UI/Common/dev_scaffold.dart';
+import 'package:attendance_app/bloc/config/config_bloc.dart';
+import 'package:attendance_app/constants/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -53,10 +55,13 @@ class _StudentLetterPageState extends State<StudentLetterPage> {
           tag: 'letters',
           child: Scaffold(
             resizeToAvoidBottomInset: true,
-            backgroundColor: Color(0xFF24323F),
+            backgroundColor:
+                ConfigBloc().darkModeOn ? Colors.grey[900] : Colors.white,
             floatingActionButton: RaisedButton(
               shape: CircleBorder(),
-              color: Colors.lightBlueAccent,
+              color: ConfigBloc().darkModeOn
+                  ? kFABDarkModeColor
+                  : kFABLightModeColor,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -75,7 +80,9 @@ class _StudentLetterPageState extends State<StudentLetterPage> {
                 padding: const EdgeInsets.all(14.0),
                 child: Icon(
                   Icons.add,
-                  color: Colors.white,
+                  color: ConfigBloc().darkModeOn
+                      ? kIconDarkModeColor
+                      : kIconLightModeColor,
                 ),
               ),
             ),
@@ -168,6 +175,7 @@ class _StudentLetterPageState extends State<StudentLetterPage> {
         margin: EdgeInsets.symmetric(horizontal: 20),
         child: Card(
           elevation: 10,
+          color: ConfigBloc().darkModeOn ? Colors.black : Colors.white,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
@@ -437,7 +445,11 @@ class _StudentLetterPageState extends State<StudentLetterPage> {
                       GestureDetector(
                         child: Text(
                           'Add USN',
-                          style: TextStyle(color: Colors.orange, fontSize: 16),
+                          style: TextStyle(
+                              color: ConfigBloc().darkModeOn
+                                  ? kSubmitDarkModeColor
+                                  : kSubmitLightModeColor,
+                              fontSize: 16),
                         ),
                         onTap: () {
                           setState(() {
@@ -446,8 +458,16 @@ class _StudentLetterPageState extends State<StudentLetterPage> {
                         },
                       ),
                       RaisedButton(
-                        color: Colors.orange,
-                        child: Text('Submit'),
+                        color: ConfigBloc().darkModeOn
+                            ? kSubmitDarkModeColor
+                            : kSubmitLightModeColor,
+                        child: Text(
+                          'Submit',
+                          style: TextStyle(
+                              color: ConfigBloc().darkModeOn
+                                  ? kSubmitTextDarkModeColor
+                                  : kSubmitTextLightModeColor),
+                        ),
                         onPressed: () async {
                           /// Regex to match the USN entered
                           RegExp regex =
